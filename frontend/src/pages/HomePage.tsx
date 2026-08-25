@@ -4,6 +4,7 @@ import {
   Shield, QrCode, Link2, Users, Zap, Eye,
   ArrowRight, Check, Terminal, HelpCircle, Flag
 } from 'lucide-react';
+import { sounds } from '../lib/soundEffects';
 
 const CIVIC_SCENARIOS = [
   {
@@ -33,7 +34,7 @@ const CIVIC_SCENARIOS = [
     type: 'VERIFIED_SAFE',
     risk: 'SAFE',
     context: 'Legitimate encrypted destination with clean DNS resolution and valid TLS.',
-  },
+  }
 ];
 
 const BENCHMARK_METRICS = [
@@ -45,9 +46,15 @@ const BENCHMARK_METRICS = [
 
 export default function HomePage() {
   const navigate = useNavigate();
-  const [selectedScenario, setSelectedScenario] = useState(0);
+  const [selectedScenario, setSelectedScenario] = useState<number>(0);
+
+  const handleSelectScenario = (index: number) => {
+    setSelectedScenario(index);
+    sounds.playClick();
+  };
 
   const handleTestScenario = (url: string) => {
+    sounds.playScanBeam();
     navigate('/analyze', { state: { url } });
   };
 
@@ -56,7 +63,7 @@ export default function HomePage() {
       {/* Hero */}
       <section className="hero-section bg-gradient-hero bg-grid">
         <div className="container hero-content">
-          <div className="hero-badge animate-fade-up">
+          <div className="hero-badge animate-fade-up floating-gentle">
             <Shield size={13} />
             Community Digital Safety Gateway
           </div>
@@ -69,13 +76,31 @@ export default function HomePage() {
             and uses community reports to help protect everyone.
           </p>
           <div className="hero-actions animate-fade-up flex-wrap" style={{ animationDelay: '0.15s' }}>
-            <Link to="/scan" id="cta-scan" className="btn btn-primary btn-lg animate-glow flex items-center gap-2">
+            <Link
+              to="/scan"
+              id="cta-scan"
+              className="btn btn-primary btn-lg animate-glow flex items-center gap-2"
+              onClick={() => sounds.playScanBeam()}
+              onMouseEnter={() => sounds.playHover()}
+            >
               <QrCode size={18} /> SCAN QR
             </Link>
-            <Link to="/check" id="cta-check" className="btn btn-secondary btn-lg flex items-center gap-2">
+            <Link
+              to="/check"
+              id="cta-check"
+              className="btn btn-secondary btn-lg flex items-center gap-2"
+              onClick={() => sounds.playClick()}
+              onMouseEnter={() => sounds.playHover()}
+            >
               <Link2 size={18} /> CHECK LINK
             </Link>
-            <Link to="/community" id="cta-report" className="btn btn-outline btn-lg flex items-center gap-2">
+            <Link
+              to="/community"
+              id="cta-report"
+              className="btn btn-outline btn-lg flex items-center gap-2"
+              onClick={() => sounds.playClick()}
+              onMouseEnter={() => sounds.playHover()}
+            >
               <Flag size={18} /> REPORT THREAT
             </Link>
           </div>
@@ -83,7 +108,7 @@ export default function HomePage() {
 
         {/* Floating scanner visual */}
         <div className="hero-visual">
-          <div className="scanner-frame animate-glow">
+          <div className="scanner-frame animate-glow floating-element">
             <div className="scanner-corners">
               <span /><span /><span /><span />
             </div>
@@ -116,7 +141,8 @@ export default function HomePage() {
             {CIVIC_SCENARIOS.map((sc, i) => (
               <div
                 key={i}
-                onClick={() => setSelectedScenario(i)}
+                onClick={() => handleSelectScenario(i)}
+                onMouseEnter={() => sounds.playHover()}
                 className={`glass-card p-4 cursor-pointer transition-all ${
                   selectedScenario === i ? 'ring-2' : ''
                 }`}

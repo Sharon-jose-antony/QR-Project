@@ -5,6 +5,7 @@ import type { AnalysisResult } from '../lib/api';
 import AnalysisCard from '../components/AnalysisCard';
 import ReportModal from '../components/ReportModal';
 import { Link2, Search, AlertCircle, X, Shield } from 'lucide-react';
+import { sounds } from '../lib/soundEffects';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -43,18 +44,26 @@ export default function AnalyzePage() {
       inputRef.current?.focus();
       return;
     }
+    sounds.playScanBeam();
     setLoading(true);
     setError(null);
     setResult(null);
     try {
       const res = await urlApi.analyze(trimmed);
-      setResult(res.data.data);
+      const data = res.data.data;
+      setResult(data);
+      if (data.riskLevel === 'LOW' || data.riskScore < 25) {
+        sounds.playSuccess();
+      } else {
+        sounds.playWarning();
+      }
     } catch (err: any) {
       const msg =
         err?.response?.data?.error?.message ||
         'Analysis failed. Please ensure the URL is valid.';
       setError(msg);
       toast.error(msg);
+      sounds.playWarning();
     } finally {
       setLoading(false);
     }
