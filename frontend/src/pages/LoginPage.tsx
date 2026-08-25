@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Shield, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { ScanzoLogo } from '../components/ScanzoLogo';
 import toast from 'react-hot-toast';
 
 export default function LoginPage() {
@@ -34,11 +35,9 @@ export default function LoginPage() {
       <div className="auth-card glass-card animate-fade-up">
         {/* Logo */}
         <div className="auth-header">
-          <div className="logo-icon">
-            <Shield size={20} />
-          </div>
-          <h1 style={{ fontSize: '1.5rem' }}>Welcome back</h1>
-          <p className="text-secondary text-sm">Sign in to your QRGuard account</p>
+          <ScanzoLogo height={36} />
+          <h1 style={{ fontSize: '1.5rem', marginTop: '0.5rem' }}>Welcome back</h1>
+          <p className="text-secondary text-sm">Sign in to your Scanzo account</p>
         </div>
 
         {/* Error */}

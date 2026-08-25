@@ -40,7 +40,7 @@ const COMMUNITY_CODE_ITEMS = [
   {
     icon: <Shield size={18} style={{ color: 'var(--color-primary)' }} />,
     title: 'Responsible Disclosure & Rapid Defense',
-    desc: 'All community threat intelligence is processed through automated risk pipelines to immediately protect global QRGuard users before attacks spread.',
+    desc: 'All community threat intelligence is processed through automated risk pipelines to immediately protect global Scanzo users before attacks spread.',
   },
   {
     icon: <LockShieldIcon />,
@@ -380,7 +380,7 @@ export default function CommunityPage() {
               <div className="flex items-center gap-3 mb-4">
                 <Shield size={28} style={{ color: 'var(--color-primary)' }} />
                 <div>
-                  <h2 style={{ fontSize: '1.4rem' }}>QRGuard Community Defense Protocol & Ethics</h2>
+                  <h2 style={{ fontSize: '1.4rem' }}>Scanzo Community Defense Protocol & Ethics</h2>
                   <p className="text-secondary text-sm">
                     Guiding principles ensuring crowdsourced security remains ethical, transparent, and legally sound.
                   </p>

@@ -108,7 +108,7 @@ export default function HomePage() {
             </div>
             <h2>Real-World Community Attack Scenarios</h2>
             <p className="text-secondary" style={{ maxWidth: 620, margin: '0 auto' }}>
-              Test how QRGuard’s multi-layered security engine handles real quishing scams and attack vectors.
+              Test how Scanzo’s multi-layered security engine handles real quishing scams and attack vectors.
             </p>
           </div>
 

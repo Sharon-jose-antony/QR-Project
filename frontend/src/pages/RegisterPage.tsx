@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Shield, Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
+import { Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
+import { ScanzoLogo } from '../components/ScanzoLogo';
 import toast from 'react-hot-toast';
 
 function PasswordStrength({ password }: { password: string }) {
@@ -58,7 +59,7 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       await register(email, username, password);
-      toast.success('Account created! Welcome to QRGuard.');
+      toast.success('Account created! Welcome to Scanzo.');
       navigate('/dashboard');
     } catch (err: any) {
       const msg =
@@ -76,10 +77,8 @@ export default function RegisterPage() {
     <div className="auth-page page flex items-center justify-center">
       <div className="auth-card glass-card animate-fade-up">
         <div className="auth-header">
-          <div className="logo-icon">
-            <Shield size={20} />
-          </div>
-          <h1 style={{ fontSize: '1.5rem' }}>Create your account</h1>
+          <ScanzoLogo height={36} />
+          <h1 style={{ fontSize: '1.5rem', marginTop: '0.5rem' }}>Create your account</h1>
           <p className="text-secondary text-sm">Free forever · No credit card needed</p>
         </div>
 

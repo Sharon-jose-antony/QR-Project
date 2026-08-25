@@ -128,8 +128,8 @@ export default function AnalysisCard({ result, onReport, onGoBack, autoOpenSafe 
               <h2 className="text-xl font-bold mt-1">
                 {combined?.primaryWarningTitle || (
                   isSafe ? 'Destination verified safe to open.' :
-                  isSuspicious ? `QRGuard detected ${result.indicators.length || 1} indicators that may indicate this link is unsafe.` :
-                  result.blocked ? 'QRGuard blocked this destination before connection.' : 'High probability of malicious intent, phishing, or fraud.'
+                  isSuspicious ? `Scanzo detected ${result.indicators.length || 1} indicators that may indicate this link is unsafe.` :
+                  result.blocked ? 'Scanzo blocked this destination before connection.' : 'High probability of malicious intent, phishing, or fraud.'
                 )}
               </h2>
               <p className="text-secondary text-xs mt-1 max-w-2xl">
@@ -234,7 +234,7 @@ export default function AnalysisCard({ result, onReport, onGoBack, autoOpenSafe 
             ) : (
               <p className="text-secondary text-xs mt-0.5">
                 {drift.firstObservation
-                  ? 'First recorded observation of this QR code payload by QRGuard.'
+                  ? 'First recorded observation of this QR code payload by Scanzo.'
                   : 'Destination matches previously recorded scans without redirect drift.'}
               </p>
             )}
@@ -309,7 +309,7 @@ export default function AnalysisCard({ result, onReport, onGoBack, autoOpenSafe 
                 </h4>
               </div>
               <p className="text-secondary text-xs mt-1" style={{ maxWidth: 600, lineHeight: 1.5 }}>
-                QRGuard detected security anomalies on this link ({score}/100 Risk Score). Visiting unknown or flagged 
+                Scanzo detected security anomalies on this link ({score}/100 Risk Score). Visiting unknown or flagged 
                 destinations may expose you to login credential theft, malware downloads, or payment scams.
               </p>
             </div>
@@ -450,7 +450,7 @@ export default function AnalysisCard({ result, onReport, onGoBack, autoOpenSafe 
 
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted flex items-center gap-1">
-              <CheckCircle2 size={13} style={{ color: 'var(--color-risk-low)' }} /> QRGuard Gateway Verified
+              <CheckCircle2 size={13} style={{ color: 'var(--color-risk-low)' }} /> Scanzo Gateway Verified
             </span>
           </div>
         </div>

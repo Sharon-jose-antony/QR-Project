@@ -198,7 +198,7 @@ function performClientSideAnalysis(rawUrl: string): AnalysisResult {
       riskLevel: 'CRITICAL',
       redirectCount: 0,
       indicators: ['🚨 Blocked: Invalid URL structure or dangerous scheme'],
-      recommendation: 'This destination cannot be analyzed safely and has been blocked by QRGuard.',
+      recommendation: 'This destination cannot be analyzed safely and has been blocked by Scanzo.',
       riskFactors: [{ factor: 'INVALID_URL', score: 85, description: 'Invalid or unsupported scheme' }],
       redirectChain: [],
       blocked: true,
@@ -324,7 +324,7 @@ function performClientSideAnalysis(rawUrl: string): AnalysisResult {
       ? 'This destination exhibits critical security anomalies and should not be accessed.'
       : hasHistoricalReports
       ? 'This destination has prior community reports.'
-      : 'This QR code has not been observed by QRGuard before.',
+      : 'This QR code has not been observed by Scanzo before.',
     historicalWarningActive: hasHistoricalReports || isCritical,
     destinationChangeWarningActive: false,
     isSafeToAutoOpen: riskScore < 25 && !isBlocked,
@@ -341,7 +341,7 @@ function performClientSideAnalysis(rawUrl: string): AnalysisResult {
     redirectCount: 0,
     indicators,
     recommendation: isBlocked
-      ? 'This destination was blocked by QRGuard security controls.'
+      ? 'This destination was blocked by Scanzo security controls.'
       : riskScore >= 50
       ? 'DO NOT visit this URL. This destination exhibits high-risk indicators.'
       : 'Destination verified safe based on deterministic security checks.',
