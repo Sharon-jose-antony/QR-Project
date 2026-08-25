@@ -1,6 +1,6 @@
 import scanzoLogoImg from '../assets/scanzo-logo.png';
 
-export function ScanzoLogo({ height = 30, className = '', alt = 'Scanzo' }: { height?: number; className?: string; alt?: string }) {
+export function ScanzoLogo({ height = 32, className = '', alt = 'Scanzo' }: { height?: number; className?: string; alt?: string }) {
   return (
     <img
       src={scanzoLogoImg}
@@ -13,6 +13,7 @@ export function ScanzoLogo({ height = 30, className = '', alt = 'Scanzo' }: { he
         objectFit: 'contain',
         display: 'inline-block',
         verticalAlign: 'middle',
+        mixBlendMode: 'multiply',
       }}
     />
   );
@@ -31,6 +32,7 @@ export function ScanzoIcon({ size = 32 }: { size?: number }) {
         objectFit: 'contain',
         display: 'inline-block',
         verticalAlign: 'middle',
+        mixBlendMode: 'multiply',
       }}
     />
   );
