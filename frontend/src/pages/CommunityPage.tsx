@@ -267,7 +267,7 @@ export default function CommunityPage() {
                           </td>
                           <td>
                             <span className="text-sm font-bold" style={{ color: RISK_COLOR[d.riskLevel] || 'inherit' }}>
-                              {d.communityReportCount}
+                              {d.communityReportCount ?? (d as any).reportCount ?? 0}
                             </span>
                           </td>
                           <td>
@@ -294,14 +294,14 @@ export default function CommunityPage() {
                   <h3>Threat Classification Distribution</h3>
                   <span className="text-xs text-muted">Aggregated categories</span>
                 </div>
-                {data.categoryStats.length === 0 ? (
+                {(!data.categoryStats || data.categoryStats.length === 0) ? (
                   <p className="text-muted text-sm text-center py-6">No threat classification telemetry recorded yet.</p>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
-                    {data.categoryStats.map((c, i) => {
-                      const max = data.categoryStats[0]?._count?.category || 1;
-                      const count = c._count.category;
-                      const pct = Math.round((count / max) * 100);
+                    {data.categoryStats.map((c: any, i) => {
+                      const count = c._count?.category ?? c.count ?? 1;
+                      const max = (data.categoryStats[0] as any)?._count?.category ?? (data.categoryStats[0] as any)?.count ?? 1;
+                      const pct = Math.round((count / Math.max(max, 1)) * 100);
                       return (
                         <div key={i}>
                           <div className="flex justify-between items-center mb-1">
