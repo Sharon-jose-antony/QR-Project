@@ -25,7 +25,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiResponse<Void>> handleGenericException(Exception ex) {
+        ex.printStackTrace();
+        String detail = ex.getMessage() != null ? ex.getMessage() : "An unexpected server error occurred";
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.fail("INTERNAL_ERROR", "An unexpected server error occurred"));
+                .body(ApiResponse.fail("INTERNAL_ERROR", detail));
     }
 }
