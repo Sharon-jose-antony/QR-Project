@@ -66,7 +66,15 @@
 
 @keyframes floatGentle {
   0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-5px) rotate(0.5deg); }
+  50% { transform: translateY(-5px) rotate(0.6deg); }
+}
+
+@keyframes shiverSubtle {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  20% { transform: translate(-1.5px, 1px) rotate(-0.4deg); }
+  40% { transform: translate(1.5px, -1px) rotate(0.4deg); }
+  60% { transform: translate(-1px, -1.5px) rotate(-0.3deg); }
+  80% { transform: translate(1px, 1.5px) rotate(0.3deg); }
 }
 
 .floating-element {
@@ -75,6 +83,86 @@
 
 .floating-gentle {
   animation: floatGentle 5.5s ease-in-out infinite;
+}
+
+.shaky-hover:hover {
+  animation: shiverSubtle 0.35s ease infinite;
+}
+
+/* ── Ambient Floating Mesh & Mint-Emerald Gradient Layer ─────── */
+.ambient-background-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+  background: 
+    radial-gradient(circle at 15% 15%, rgba(16, 185, 129, 0.08) 0%, transparent 45%),
+    radial-gradient(circle at 85% 75%, rgba(20, 184, 166, 0.09) 0%, transparent 42%),
+    radial-gradient(circle at 50% 50%, rgba(240, 253, 244, 0.6) 0%, rgba(248, 250, 252, 1) 100%);
+}
+
+.ambient-grid-overlay {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(16, 185, 129, 0.14) 1.2px, transparent 1.2px);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(ellipse at center, black 45%, transparent 85%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 45%, transparent 85%);
+  opacity: 0.65;
+}
+
+.ambient-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(85px);
+  opacity: 0.5;
+  will-change: transform;
+}
+
+.ambient-orb-1 {
+  width: 520px;
+  height: 520px;
+  background: radial-gradient(circle, #34d399, #059669);
+  top: -100px;
+  left: 8%;
+  animation: orbFloat1 15s ease-in-out infinite alternate;
+}
+
+.ambient-orb-2 {
+  width: 580px;
+  height: 580px;
+  background: radial-gradient(circle, #2dd4bf, #0d9488);
+  bottom: 5%;
+  right: 5%;
+  animation: orbFloat2 19s ease-in-out infinite alternate;
+}
+
+.ambient-orb-3 {
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, #a7f3d0, #10b981);
+  top: 40%;
+  left: 45%;
+  animation: orbFloat3 13s ease-in-out infinite alternate;
+}
+
+@keyframes orbFloat1 {
+  0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  50% { transform: translate(60px, 45px) scale(1.12) rotate(25deg); }
+  100% { transform: translate(-45px, 85px) scale(0.92) rotate(-15deg); }
+}
+
+@keyframes orbFloat2 {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-90px, -70px) scale(1.15); }
+  100% { transform: translate(45px, -45px) scale(0.9); }
+}
+
+@keyframes orbFloat3 {
+  0% { transform: translate(-50%, -50%) scale(0.95); }
+  50% { transform: translate(-40%, -35%) scale(1.18); }
+  100% { transform: translate(-60%, -60%) scale(0.9); }
 }
 
 .audio-toggle-btn {
@@ -141,6 +229,19 @@ body {
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.app-layout {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-main {
+  position: relative;
+  z-index: 1;
+  flex: 1;
 }
 
 #root {

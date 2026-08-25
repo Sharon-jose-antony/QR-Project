@@ -26,6 +26,13 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function AppRoutes() {
   return (
     <div className="app-layout">
+      {/* Floating Ambient Mesh & Calm Emerald Glow Background */}
+      <div className="ambient-background-layer" aria-hidden="true">
+        <div className="ambient-orb ambient-orb-1" />
+        <div className="ambient-orb ambient-orb-2" />
+        <div className="ambient-orb ambient-orb-3" />
+        <div className="ambient-grid-overlay" />
+      </div>
       <Navbar />
       <main className="app-main">
         <Routes>
