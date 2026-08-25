@@ -95,10 +95,9 @@ public class QrReputationEngine {
         identity.setReputationLevel(repLevel);
         identity.setReportCount(reports.size());
         identity.setHasCriticalHistory(hasCritical);
-        if (hasCritical) {
-            identity.setCriticalReason(criticalReason);
+        if (identity.getId() != null && identityRepository.existsById(identity.getId())) {
+            identityRepository.save(identity);
         }
-        identityRepository.save(identity);
 
         // Extract top report reasons
         List<String> topReasons = new ArrayList<>(categoryCounts.keySet());
