@@ -119,8 +119,6 @@
 .audio-wave span:nth-child(2) { height: 11px; animation-delay: 0.35s; }
 .audio-wave span:nth-child(3) { height: 7px; animation-delay: 0.2s; }
 
-}
-
 /* ── Reset & Base ───────────────────────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;
