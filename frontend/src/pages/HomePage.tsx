@@ -65,7 +65,7 @@ export default function HomePage() {
             <span className="gradient-text">Then open it.</span>
           </h1>
           <p className="hero-subtitle animate-fade-up" style={{ animationDelay: '0.1s' }}>
-            QRGuard checks QR codes and suspicious links before you visit them, explains potential risks, 
+            Scanzo checks QR codes and suspicious links before you visit them, explains potential risks, 
             and uses community reports to help protect everyone.
           </p>
           <div className="hero-actions animate-fade-up flex-wrap" style={{ animationDelay: '0.15s' }}>
@@ -217,8 +217,8 @@ export default function HomePage() {
                 <h3 style={{ fontSize: '1.15rem' }}>The Failure Case Protocol: Zero False Reassurance</h3>
                 <p className="text-secondary text-sm mt-1" style={{ maxWidth: 800, lineHeight: 1.6 }}>
                   A confident wrong answer is dangerous. If a destination cannot be verified due to server timeouts, 
-                  suspicious masking, or untrusted redirects, QRGuard refuses to issue a false "Safe" rating. Instead, it marks 
-                  the destination as <strong>UNVERIFIED / CAUTION</strong> and prompts the user with specific safety precautions.
+                  suspicious masking, or untrusted redirects, Scanzo refuses to issue a false "Safe" rating. Instead, it marks 
+                  the destination with prominent safety warnings and requires explicit user consent before opening.
                 </p>
               </div>
             </div>
