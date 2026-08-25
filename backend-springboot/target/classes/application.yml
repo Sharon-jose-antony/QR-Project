@@ -1,0 +1,37 @@
+server:
+  port: 3001
+  servlet:
+    session:
+      cookie:
+        name: qrguard_sid
+        http-only: true
+        secure: false
+        max-age: 86400
+
+spring:
+  application:
+    name: qrguard-backend
+  datasource:
+    url: jdbc:sqlite:./qrguard.db
+    driver-class-name: org.sqlite.JDBC
+  jpa:
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
+
+app:
+  cors:
+    allowed-origins:
+      - "http://localhost:5173"
+      - "http://127.0.0.1:5173"
+      - "https://qrguard-eta.vercel.app"
+      - "https://sharon-jose-antony.github.io"
+  security:
+    max-redirect-hops: 5
+    http-timeout-ms: 10000
+    max-response-size-bytes: 1048576 # 1MB

@@ -1,0 +1,11 @@
+package com.qrguard;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class QrGuardApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(QrGuardApplication.class, args);
+    }
+}

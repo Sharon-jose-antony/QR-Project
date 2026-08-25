@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.qrguard.QrReputationTests
+-------------------------------------------------------------------------------
+Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 7.836 s -- in com.qrguard.QrReputationTests
