@@ -1,10 +1,22 @@
 // API client for QRGuard backend with client-side fallback for GitHub Pages
 import axios from 'axios';
 
+const getBaseUrl = (): string => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  // Local development uses relative URL with Vite proxy to localhost:3001
+  if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+    return '';
+  }
+  // Production hosted frontend connects directly to Render backend
+  return 'https://qr-project-1-0nv6.onrender.com';
+};
+
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '',
+  baseURL: getBaseUrl(),
   withCredentials: true,
-  timeout: 10000,
+  timeout: 15000,
   headers: {
     'Content-Type': 'application/json',
   },
