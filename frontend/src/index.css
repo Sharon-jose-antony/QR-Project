@@ -97,54 +97,54 @@
   z-index: 0;
   overflow: hidden;
   background: 
-    radial-gradient(circle at 15% 15%, rgba(16, 185, 129, 0.08) 0%, transparent 45%),
-    radial-gradient(circle at 85% 75%, rgba(20, 184, 166, 0.09) 0%, transparent 42%),
-    radial-gradient(circle at 50% 50%, rgba(240, 253, 244, 0.6) 0%, rgba(248, 250, 252, 1) 100%);
+    radial-gradient(circle at 20% 15%, rgba(16, 185, 129, 0.05) 0%, transparent 40%),
+    radial-gradient(circle at 80% 30%, rgba(20, 184, 166, 0.04) 0%, transparent 35%),
+    #f8fafc;
 }
 
 .ambient-grid-overlay {
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(rgba(16, 185, 129, 0.14) 1.2px, transparent 1.2px);
-  background-size: 32px 32px;
-  mask-image: radial-gradient(ellipse at center, black 45%, transparent 85%);
-  -webkit-mask-image: radial-gradient(ellipse at center, black 45%, transparent 85%);
-  opacity: 0.65;
+  background-image: radial-gradient(rgba(16, 185, 129, 0.08) 1.2px, transparent 1.2px);
+  background-size: 36px 36px;
+  mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);
+  opacity: 0.45;
 }
 
 .ambient-orb {
   position: absolute;
   border-radius: 50%;
-  filter: blur(85px);
-  opacity: 0.5;
+  filter: blur(95px);
+  opacity: 0.18;
   will-change: transform;
 }
 
 .ambient-orb-1 {
-  width: 520px;
-  height: 520px;
-  background: radial-gradient(circle, #34d399, #059669);
-  top: -100px;
-  left: 8%;
-  animation: orbFloat1 15s ease-in-out infinite alternate;
+  width: 450px;
+  height: 450px;
+  background: radial-gradient(circle, #10b981, #059669);
+  top: -80px;
+  left: 10%;
+  animation: orbFloat1 16s ease-in-out infinite alternate;
 }
 
 .ambient-orb-2 {
-  width: 580px;
-  height: 580px;
+  width: 480px;
+  height: 480px;
   background: radial-gradient(circle, #2dd4bf, #0d9488);
-  bottom: 5%;
-  right: 5%;
-  animation: orbFloat2 19s ease-in-out infinite alternate;
+  top: 15%;
+  right: 8%;
+  animation: orbFloat2 20s ease-in-out infinite alternate;
 }
 
 .ambient-orb-3 {
-  width: 420px;
-  height: 420px;
-  background: radial-gradient(circle, #a7f3d0, #10b981);
-  top: 40%;
-  left: 45%;
-  animation: orbFloat3 13s ease-in-out infinite alternate;
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(circle, #6ee7b7, #10b981);
+  top: 35%;
+  left: 35%;
+  animation: orbFloat3 14s ease-in-out infinite alternate;
 }
 
 @keyframes orbFloat1 {
@@ -246,22 +246,23 @@ body {
 
 /* ── Footer: High-Contrast Crisp Solid Surface ───────────────────── */
 .footer {
-  position: relative;
-  z-index: 10;
-  background: #ffffff;
-  border-top: 1px solid rgba(15, 23, 42, 0.08);
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.03);
-  padding: 3.5rem 0 2rem;
-  margin-top: auto;
+  position: relative !important;
+  z-index: 50 !important;
+  background-color: #ffffff !important;
+  border-top: 1px solid #cbd5e1 !important;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.04) !important;
+  padding: 3.5rem 0 2rem !important;
+  margin-top: auto !important;
+  isolation: isolate !important;
 }
 
 .footer-inner {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 2.5rem;
-  padding-bottom: 2.5rem;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  display: flex !important;
+  flex-wrap: wrap !important;
+  justify-content: space-between !important;
+  gap: 2.5rem !important;
+  padding-bottom: 2.5rem !important;
+  border-bottom: 1px solid #e2e8f0 !important;
 }
 
 .footer-brand {
@@ -269,79 +270,79 @@ body {
 }
 
 .footer-tagline {
-  margin-top: 0.75rem;
-  font-size: 0.875rem;
-  color: #475569;
-  line-height: 1.5;
-  font-weight: 500;
+  margin-top: 0.75rem !important;
+  font-size: 0.875rem !important;
+  color: #1e293b !important; /* Crisp Dark Slate 800 */
+  line-height: 1.5 !important;
+  font-weight: 500 !important;
 }
 
 .footer-links {
-  display: flex;
-  gap: 3.5rem;
-  flex-wrap: wrap;
+  display: flex !important;
+  gap: 3.5rem !important;
+  flex-wrap: wrap !important;
 }
 
 .footer-col {
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.65rem !important;
 }
 
 .footer-col h5 {
-  font-size: 0.8125rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #090d16;
-  margin-bottom: 0.25rem;
+  font-size: 0.8125rem !important;
+  font-weight: 900 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.08em !important;
+  color: #000000 !important; /* Pure Solid Black */
+  margin-bottom: 0.35rem !important;
 }
 
 .footer-col a {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #334155;
-  text-decoration: none;
-  transition: all 0.15s ease;
+  font-size: 0.875rem !important;
+  font-weight: 700 !important;
+  color: #0f172a !important; /* Deep Slate 900 */
+  text-decoration: none !important;
+  transition: all 0.15s ease !important;
 }
 
 .footer-col a:hover {
-  color: #059669;
-  transform: translateX(2px);
+  color: #059669 !important; /* Vivid Emerald */
+  transform: translateX(2px) !important;
 }
 
 .footer-socials {
-  display: flex;
-  gap: 0.75rem;
-  align-items: flex-start;
+  display: flex !important;
+  gap: 0.75rem !important;
+  align-items: flex-start !important;
 }
 
 .footer-socials a {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: #f1f5f9;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  color: #334155;
-  transition: all 0.15s ease;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 50% !important;
+  background: #f1f5f9 !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #0f172a !important;
+  transition: all 0.15s ease !important;
 }
 
 .footer-socials a:hover {
-  background: #ecfdf5;
-  color: #059669;
-  border-color: #10b981;
-  transform: translateY(-2px);
+  background: #ecfdf5 !important;
+  color: #059669 !important;
+  border-color: #10b981 !important;
+  transform: translateY(-2px) !important;
 }
 
 .footer-bottom {
-  padding-top: 1.5rem;
-  text-align: center;
-  font-size: 0.8125rem;
-  color: #64748b;
-  font-weight: 500;
+  padding-top: 1.5rem !important;
+  text-align: center !important;
+  font-size: 0.8125rem !important;
+  color: #334155 !important; /* Slate 700 */
+  font-weight: 600 !important;
 }
 
 #root {
