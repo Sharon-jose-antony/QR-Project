@@ -30,11 +30,11 @@ app.use(securityHeaders);
 app.use(permissionsPolicy);
 
 // ── CORS ───────────────────────────────────────────────────────────────────────
-const CORS_ORIGIN = process.env.CORS_ORIGIN || process.env.FRONTEND_URL || 'http://localhost:5173';
+const CORS_ORIGIN = process.env.CORS_ORIGIN || process.env.FRONTEND_URL || true;
 
 app.use(
   cors({
-    origin: CORS_ORIGIN,        // Only allow configured frontend
+    origin: CORS_ORIGIN,        // Allow configured frontend or reflect origin
     credentials: true,          // Allow cookies
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'X-CSRF-Token'],

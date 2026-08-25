@@ -23,7 +23,8 @@ export function csrfOriginProtection(req: Request, res: Response, next: NextFunc
 
   // If origin is provided, it must match allowed frontend origin
   if (origin) {
-    if (origin === allowedOrigin || origin === 'http://localhost:5173' || origin === 'http://127.0.0.1:5173') {
+    const isVercel = origin.endsWith('.vercel.app');
+    if (origin === allowedOrigin || origin === 'http://localhost:5173' || origin === 'http://127.0.0.1:5173' || isVercel) {
       return next();
     }
 
@@ -47,7 +48,8 @@ export function csrfOriginProtection(req: Request, res: Response, next: NextFunc
     try {
       const refererUrl = new URL(referer);
       const refererOrigin = `${refererUrl.protocol}//${refererUrl.host}`;
-      if (refererOrigin === allowedOrigin || refererOrigin === 'http://localhost:5173' || refererOrigin === 'http://127.0.0.1:5173') {
+      const isVercel = refererUrl.host.endsWith('.vercel.app');
+      if (refererOrigin === allowedOrigin || refererOrigin === 'http://localhost:5173' || refererOrigin === 'http://127.0.0.1:5173' || isVercel) {
         return next();
       }
 
