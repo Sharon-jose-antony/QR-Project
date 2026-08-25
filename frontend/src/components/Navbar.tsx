@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Menu, X, LogOut, History, BarChart2, ChevronDown, Volume2, VolumeX } from 'lucide-react';
+import { Menu, X, LogOut, History, BarChart2, ChevronDown, VolumeX } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { ScanzoLogo } from './ScanzoLogo';
 import { sounds } from '../lib/soundEffects';

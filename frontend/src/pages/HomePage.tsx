@@ -4,6 +4,7 @@ import {
   Shield, QrCode, Link2, Users, Zap, Eye,
   ArrowRight, Check, Terminal, HelpCircle, Flag
 } from 'lucide-react';
+import { sounds } from '../lib/soundEffects';
 
 const CIVIC_SCENARIOS = [
   {
@@ -140,7 +141,8 @@ export default function HomePage() {
             {CIVIC_SCENARIOS.map((sc, i) => (
               <div
                 key={i}
-                onClick={() => setSelectedScenario(i)}
+                onClick={() => handleSelectScenario(i)}
+                onMouseEnter={() => sounds.playHover()}
                 className={`glass-card p-4 cursor-pointer transition-all ${
                   selectedScenario === i ? 'ring-2' : ''
                 }`}
