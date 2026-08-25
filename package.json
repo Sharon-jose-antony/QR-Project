@@ -1,0 +1,9 @@
+{
+  "name": "qrguard-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "postinstall": "cd backend && npx prisma generate",
+    "build": "cd backend && npx prisma generate && cd ../frontend && npm run build"
+  }
+}

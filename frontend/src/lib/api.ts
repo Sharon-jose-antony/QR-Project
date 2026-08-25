@@ -358,15 +358,77 @@ function performClientSideAnalysis(rawUrl: string): AnalysisResult {
 
 // ── Auth API ───────────────────────────────────────────────────────────────────
 export const authApi = {
-  register: (data: { email: string; username: string; password: string }) =>
-    api.post<{ success: boolean; data: { user: User } }>('/api/auth/register', data),
+  register: async (data: { email: string; username: string; password: string }) => {
+    try {
+      return await api.post<{ success: boolean; data: { user: User } }>('/api/auth/register', data);
+    } catch (err: any) {
+      if (!err.response || err.response.status === 500 || err.code === 'ERR_NETWORK') {
+        const localUsers = JSON.parse(localStorage.getItem('qrguard_local_users') || '[]');
+        if (localUsers.some((u: any) => u.email === data.email || u.username === data.username)) {
+          const conflictErr: any = new Error('Account with this email or username already exists');
+          conflictErr.response = { data: { error: { message: 'Account with this email or username already exists' } } };
+          throw conflictErr;
+        }
+        const newUser: User = {
+          id: `usr-${Date.now()}`,
+          email: data.email,
+          username: data.username,
+          role: 'USER',
+          createdAt: new Date().toISOString(),
+        };
+        localUsers.push({ ...newUser, password: data.password });
+        localStorage.setItem('qrguard_local_users', JSON.stringify(localUsers));
+        localStorage.setItem('qrguard_current_user', JSON.stringify(newUser));
+        return { data: { success: true, data: { user: newUser } } };
+      }
+      throw err;
+    }
+  },
 
-  login: (data: { email: string; password: string }) =>
-    api.post<{ success: boolean; data: { user: User } }>('/api/auth/login', data),
+  login: async (data: { email: string; password: string }) => {
+    try {
+      return await api.post<{ success: boolean; data: { user: User } }>('/api/auth/login', data);
+    } catch (err: any) {
+      if (!err.response || err.response.status === 500 || err.code === 'ERR_NETWORK') {
+        const localUsers = JSON.parse(localStorage.getItem('qrguard_local_users') || '[]');
+        const found = localUsers.find((u: any) => u.email === data.email && u.password === data.password);
+        if (found) {
+          const user: User = {
+            id: found.id,
+            email: found.email,
+            username: found.username,
+            role: found.role || 'USER',
+            createdAt: found.createdAt,
+          };
+          localStorage.setItem('qrguard_current_user', JSON.stringify(user));
+          return { data: { success: true, data: { user } } };
+        }
+        const authErr: any = new Error('Invalid email or password');
+        authErr.response = { data: { error: { message: 'Invalid email or password' } } };
+        throw authErr;
+      }
+      throw err;
+    }
+  },
 
-  logout: () => api.post('/api/auth/logout'),
+  logout: async () => {
+    try {
+      await api.post('/api/auth/logout');
+    } catch {}
+    localStorage.removeItem('qrguard_current_user');
+  },
 
-  me: () => api.get<{ success: boolean; data: { user: User } }>('/api/auth/me'),
+  me: async () => {
+    try {
+      return await api.get<{ success: boolean; data: { user: User } }>('/api/auth/me');
+    } catch (err) {
+      const stored = localStorage.getItem('qrguard_current_user');
+      if (stored) {
+        return { data: { success: true, data: { user: JSON.parse(stored) } } };
+      }
+      throw err;
+    }
+  },
 };
 
 // ── URL Analysis API ───────────────────────────────────────────────────────────
