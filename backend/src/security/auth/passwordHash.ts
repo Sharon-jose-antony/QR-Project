@@ -1,24 +1,61 @@
 /**
  * QRGuard Password Hasher
- * Uses Argon2id as recommended by OWASP for password hashing.
+ * Uses Argon2id as primary hasher with secure Crypto.scrypt fallback for serverless runtimes.
  */
 
-import argon2 from 'argon2';
+import crypto from 'crypto';
 
-const ARGON2_OPTIONS: argon2.Options = {
-  type: argon2.argon2id,
-  memoryCost: 65536,  // 64 MB
-  timeCost: 3,
-  parallelism: 4,
-};
+let argon2Module: any = null;
+try {
+  argon2Module = require('argon2');
+} catch {
+  argon2Module = null;
+}
 
 export async function hashPassword(plaintext: string): Promise<string> {
-  return argon2.hash(plaintext, ARGON2_OPTIONS);
+  if (argon2Module) {
+    try {
+      return await argon2Module.hash(plaintext, {
+        type: argon2Module.argon2id,
+        memoryCost: 65536,
+        timeCost: 3,
+        parallelism: 4,
+      });
+    } catch {
+      // Fallback to scrypt on serverless environments
+    }
+  }
+
+  // Native Node crypto.scrypt fallback (zero native binary dependency)
+  return new Promise((resolve, reject) => {
+    const salt = crypto.randomBytes(16).toString('hex');
+    crypto.scrypt(plaintext, salt, 64, (err, derivedKey) => {
+      if (err) return reject(err);
+      resolve(`$scrypt$${salt}$${derivedKey.toString('hex')}`);
+    });
+  });
 }
 
 export async function verifyPassword(hash: string, plaintext: string): Promise<boolean> {
   try {
-    return await argon2.verify(hash, plaintext);
+    if (hash.startsWith('$scrypt$')) {
+      const parts = hash.split('$');
+      const salt = parts[2];
+      const key = parts[3];
+      return new Promise((resolve) => {
+        crypto.scrypt(plaintext, salt, 64, (err, derivedKey) => {
+          if (err) return resolve(false);
+          const hashBuffer = Buffer.from(key, 'hex');
+          resolve(crypto.timingSafeEqual(hashBuffer, derivedKey));
+        });
+      });
+    }
+
+    if (argon2Module) {
+      return await argon2Module.verify(hash, plaintext);
+    }
+
+    return false;
   } catch {
     return false;
   }
