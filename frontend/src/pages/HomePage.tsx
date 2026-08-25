@@ -79,7 +79,7 @@ export default function HomePage() {
             <Link
               to="/scan"
               id="cta-scan"
-              className="btn btn-primary btn-lg animate-glow flex items-center gap-2"
+              className="btn btn-primary btn-lg animate-glow shaky-hover flex items-center gap-2"
               onClick={() => sounds.playScanBeam()}
               onMouseEnter={() => sounds.playHover()}
             >
@@ -88,7 +88,7 @@ export default function HomePage() {
             <Link
               to="/check"
               id="cta-check"
-              className="btn btn-secondary btn-lg flex items-center gap-2"
+              className="btn btn-secondary btn-lg shaky-hover flex items-center gap-2"
               onClick={() => sounds.playClick()}
               onMouseEnter={() => sounds.playHover()}
             >
@@ -97,7 +97,7 @@ export default function HomePage() {
             <Link
               to="/community"
               id="cta-report"
-              className="btn btn-outline btn-lg flex items-center gap-2"
+              className="btn btn-outline btn-lg shaky-hover flex items-center gap-2"
               onClick={() => sounds.playClick()}
               onMouseEnter={() => sounds.playHover()}
             >
