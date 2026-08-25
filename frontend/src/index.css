@@ -767,6 +767,7 @@ code, pre { font-family: var(--font-mono); }
   color: #10B981;
   background: rgba(16, 185, 129, 0.12);
   font-weight: 600;
+}
 .navbar-actions {
   display: flex;
   align-items: center;
