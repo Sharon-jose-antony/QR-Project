@@ -275,8 +275,8 @@ export default function ScanPage() {
             <QrCode size={12} /> Digital Safety Gateway
           </div>
           <h1>QR Code Security Scanner</h1>
-          <p className="text-secondary">
-            Scan using your camera or upload an image. QRGuard inspects the decoded destination before you open it.
+          <p className="text-secondary text-sm" style={{ maxWidth: 520, margin: '0 auto' }}>
+            Scan using your camera or upload an image. Scanzo inspects the decoded destination before you open it.
           </p>
         </div>
 
@@ -570,7 +570,7 @@ export default function ScanPage() {
           <div className="alert alert-info mt-6">
             <Shield size={16} style={{ flexShrink: 0 }} />
             <span>
-              <strong>Zero-Trust Guarantee:</strong> QRGuard never automatically opens links upon scanning. You always review the destination first.
+              <strong>Zero-Trust Guarantee:</strong> Scanzo never automatically opens links upon scanning. You always review the destination first.
             </span>
           </div>
         )}

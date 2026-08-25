@@ -74,8 +74,8 @@ export default function AnalyzePage() {
             <Shield size={12} /> Digital Safety Gateway
           </div>
           <h1>Link &amp; Destination Check</h1>
-          <p className="text-secondary">
-            Inspect any link before opening it. QRGuard verifies DNS, detects deceptive redirects, checks SSRF boundaries, and assesses community reputation.
+          <p className="text-secondary" style={{ maxWidth: 520, margin: '0 auto' }}>
+            Inspect any link before opening it. Scanzo verifies DNS, detects deceptive redirects, checks SSRF boundaries, and assesses community reputation.
           </p>
         </div>
 
