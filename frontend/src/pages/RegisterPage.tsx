@@ -43,7 +43,7 @@ function PasswordStrength({ password }: { password: string }) {
 }
 
 export default function RegisterPage() {
-  const { register, login } = useAuth();
+  const { register } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
@@ -58,13 +58,13 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       await register(email, username, password);
-      // Auto-login after register
-      await login(email, password);
       toast.success('Account created! Welcome to QRGuard.');
       navigate('/dashboard');
     } catch (err: any) {
       const msg =
         err?.response?.data?.error?.message ||
+        (typeof err?.response?.data === 'string' && err.response.data.length < 80 ? err.response.data : null) ||
+        err?.message ||
         'Registration failed. Please try again.';
       setError(msg);
     } finally {
