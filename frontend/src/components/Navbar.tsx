@@ -73,10 +73,10 @@ export default function Navbar() {
               )}
             </div>
           ) : (
-            <>
+            <div className="desktop-auth-btns flex items-center gap-2">
               <Link to="/login" className="btn btn-secondary btn-sm">Sign in</Link>
               <Link to="/register" className="btn btn-primary btn-sm">Get started</Link>
-            </>
+            </div>
           )}
 
           {/* Mobile hamburger */}

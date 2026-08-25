@@ -121,7 +121,7 @@ export default function AnalysisCard({ result, onReport, onGoBack, autoOpenSafe 
 
       {/* ── 2. AUTO-OPEN POPUP BANNER FOR SAFE DESTINATIONS ──────────────────── */}
       {isSafe && (
-        <div className="p-4 mx-6 mt-6 rounded-xl flex flex-wrap items-center justify-between gap-4"
+        <div className="p-4 mx-6 mt-6 rounded-xl flex flex-wrap items-center justify-between gap-4 auto-open-banner"
              style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-emerald-500/20 text-emerald-400">
@@ -142,7 +142,7 @@ export default function AnalysisCard({ result, onReport, onGoBack, autoOpenSafe 
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 auto-open-actions">
             {!hasAutoOpened && (
               <button
                 type="button"
@@ -167,8 +167,8 @@ export default function AnalysisCard({ result, onReport, onGoBack, autoOpenSafe 
       {(isSuspicious || isHighRisk) && (
         <div className="p-5 mx-6 mt-6 rounded-xl"
              style={{
-               background: isSuspicious ? 'rgba(245, 158, 11, 0.08)' : 'rgba(239, 68, 68, 0.08)',
-               border: `1px solid ${isSuspicious ? 'rgba(245, 158, 11, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`
+                background: isSuspicious ? 'rgba(245, 158, 11, 0.08)' : 'rgba(239, 68, 68, 0.08)',
+                border: `1px solid ${isSuspicious ? 'rgba(245, 158, 11, 0.3)' : 'rgba(239, 68, 68, 0.3)'}`
              }}>
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div>
@@ -184,7 +184,7 @@ export default function AnalysisCard({ result, onReport, onGoBack, autoOpenSafe 
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 permission-actions">
               {onGoBack && (
                 <button
                   type="button"

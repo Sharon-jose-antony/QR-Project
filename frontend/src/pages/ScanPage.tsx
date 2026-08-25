@@ -282,7 +282,7 @@ export default function ScanPage() {
 
         {/* Scan Mode Toggle */}
         {!result && !rawPayload && (
-          <div className="flex gap-2 mb-6 justify-center">
+          <div className="flex gap-2 mb-6 justify-center scan-toggle-btns">
             <button
               onClick={() => { setScanMode('camera'); clearAll(); }}
               className={`btn ${scanMode === 'camera' ? 'btn-primary' : 'btn-secondary'} btn-md flex items-center gap-2`}
