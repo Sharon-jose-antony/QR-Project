@@ -39,6 +39,7 @@ com\qrguard\model\CommunityReport.class
 com\qrguard\model\QrSubmission.class
 com\qrguard\security\qr\DestinationDriftService$Objects.class
 com\qrguard\config\SecurityConfig.class
+com\qrguard\config\DatabaseInitializer.class
 com\qrguard\dto\ApiResponse$ApiError.class
 com\qrguard\repository\QrCodeIdentityRepository.class
 com\qrguard\dto\UrlDtos$AnalyzeUrlRequest.class
