@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
+import { sounds } from '../lib/soundEffects';
 
 export default function ScanPage() {
   const { user } = useAuth();
@@ -56,6 +57,7 @@ export default function ScanPage() {
 
   const handleDecodedQR = useCallback(async (decodedText: string) => {
     stopCamera();
+    sounds.playScanBeam();
     setRawPayload(decodedText);
     setLoading(true);
     setError(null);
@@ -68,17 +70,25 @@ export default function ScanPage() {
       setAnalyzingMessage('Inspecting decoded URL destination…');
       try {
         const res = await urlApi.analyze(decodedText.trim());
-        setResult(res.data.data);
+        const analysisData = res.data.data;
+        setResult(analysisData);
+        if (analysisData.riskLevel === 'LOW' || analysisData.riskScore < 25) {
+          sounds.playSuccess();
+        } else {
+          sounds.playWarning();
+        }
       } catch (err: any) {
         const msg = err?.response?.data?.error?.message || 'Security analysis failed for decoded URL.';
         setError(msg);
         toast.error(msg);
+        sounds.playWarning();
       } finally {
         setLoading(false);
       }
     } else {
       setPayloadType('TEXT / UPI');
       setLoading(false);
+      sounds.playClick();
     }
   }, [stopCamera]);
 
