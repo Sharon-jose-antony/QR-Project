@@ -374,7 +374,7 @@ export const authApi = {
     try {
       return await api.post<{ success: boolean; data: { user: User } }>('/api/auth/register', data);
     } catch (err: any) {
-      if (!err.response || err.response.status === 500 || err.code === 'ERR_NETWORK') {
+      if (!err.response || err.response.status >= 500 || err.code === 'ERR_NETWORK' || err.message?.includes('Network Error')) {
         const localUsers = JSON.parse(localStorage.getItem('qrguard_local_users') || '[]');
         if (localUsers.some((u: any) => u.email === data.email || u.username === data.username)) {
           const conflictErr: any = new Error('Account with this email or username already exists');
@@ -401,9 +401,9 @@ export const authApi = {
     try {
       return await api.post<{ success: boolean; data: { user: User } }>('/api/auth/login', data);
     } catch (err: any) {
-      if (!err.response || err.response.status === 500 || err.code === 'ERR_NETWORK') {
+      if (!err.response || err.response.status >= 500 || err.code === 'ERR_NETWORK' || err.message?.includes('Network Error')) {
         const localUsers = JSON.parse(localStorage.getItem('qrguard_local_users') || '[]');
-        const found = localUsers.find((u: any) => u.email === data.email && u.password === data.password);
+        const found = localUsers.find((u: any) => (u.email === data.email || u.username === data.email) && u.password === data.password);
         if (found) {
           const user: User = {
             id: found.id,
