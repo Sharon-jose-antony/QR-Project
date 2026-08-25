@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Shield, Menu, X, LogOut, History, BarChart2, ChevronDown } from 'lucide-react';
+import { Menu, X, LogOut, History, BarChart2, ChevronDown } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { ScanzoLogo } from './ScanzoLogo';
 import toast from 'react-hot-toast';
 
 export default function Navbar() {
@@ -24,11 +25,8 @@ export default function Navbar() {
     <nav className="navbar">
       <div className="navbar-inner container-wide">
         {/* Logo */}
-        <Link to="/" className="navbar-logo">
-          <div className="logo-icon">
-            <Shield size={20} />
-          </div>
-          <span>QR<strong>Guard</strong></span>
+        <Link to="/" className="navbar-logo" style={{ display: 'flex', alignItems: 'center' }}>
+          <ScanzoLogo height={30} />
         </Link>
 
         {/* Desktop Nav */}

@@ -1,15 +1,13 @@
 import { Link } from 'react-router-dom';
-import { Shield, Globe, ExternalLink } from 'lucide-react';
+import { Globe, ExternalLink } from 'lucide-react';
+import { ScanzoLogo } from './ScanzoLogo';
 
 export default function Footer() {
   return (
     <footer className="footer">
       <div className="container-wide footer-inner">
         <div className="footer-brand">
-          <div className="logo-icon sm">
-            <Shield size={16} />
-          </div>
-          <span className="footer-logo-text">QR<strong>Guard</strong></span>
+          <ScanzoLogo height={26} />
           <p className="footer-tagline">Community Digital Safety Gateway — Scan it. Check it. Then open it.</p>
         </div>
 
@@ -43,7 +41,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="footer-bottom">
-        <p>&copy; {new Date().getFullYear()} QRGuard. Open-source threat intelligence.</p>
+        <p>&copy; {new Date().getFullYear()} Scanzo. Open-source threat intelligence.</p>
       </div>
     </footer>
   );
