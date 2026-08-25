@@ -14,6 +14,7 @@ import jsQR from 'jsqr';
 import { z } from 'zod';
 import { PrismaClient } from '@prisma/client';
 import { analyzeUrl } from '../services/urlService';
+import { resolveQrIdentity } from '../security/qr/qrIdentity';
 import { validateImageFile } from '../security/upload/fileValidator';
 import { optionalAuth } from '../middleware/auth';
 import { qrAnalyzeRateLimit } from '../middleware/rateLimit';
@@ -140,28 +141,26 @@ router.post(
 
       const payload = decoded.data;
 
-      // ── Classify payload type ──────────────────────────────────────────────
-      let payloadType = 'TEXT';
+      // ── Resolve QR Identity & Fingerprint ──────────────────────────────────
+      const { identity: qrIdentity, payloadType: detectedType } = await resolveQrIdentity(payload);
+      let payloadType = detectedType;
       let analysisResult = null;
 
-      if (/^https?:\/\//i.test(payload) || /^[a-z0-9-]+\.[a-z]{2,}/i.test(payload)) {
-        payloadType = 'URL';
-
-        // Analyze the extracted URL
+      if (payloadType === 'URL') {
+        // Analyze the extracted URL with QR identity context
         analysisResult = await analyzeUrl(payload, {
           userId: req.session?.userId,
           sessionRef: req.session?.userId || `anon-${uuidv4().substring(0, 8)}`,
+          qrPayload: payload,
+          qrCodeId: qrIdentity.id,
         });
-      } else if (/^mailto:/i.test(payload)) {
-        payloadType = 'EMAIL';
-      } else if (/^tel:/i.test(payload)) {
-        payloadType = 'TEL';
       }
 
       // ── Store QR submission ────────────────────────────────────────────────
       const qrSubmission = await prisma.qrSubmission.create({
         data: {
           userId: req.session?.userId,
+          qrCodeId: qrIdentity.id,
           payloadType,
           payload: payload.substring(0, 2048),
           analysisId: analysisResult?.id,
@@ -173,9 +172,13 @@ router.post(
 
       sendSuccess(res, {
         qrId: qrSubmission.id,
+        qrCodeId: qrIdentity.id,
         payload: payload.substring(0, 500), // Truncated for display
         payloadType,
         analysis: analysisResult,
+        historicalReputation: analysisResult?.historicalReputation,
+        destinationHistory: analysisResult?.destinationHistory,
+        combinedRisk: analysisResult?.combinedRisk,
       });
     } catch (err) {
       // Clean up file on error
@@ -187,5 +190,68 @@ router.post(
     }
   }
 );
+
+// ── GET /api/qr/:qrCodeId/history ──────────────────────────────────────────────
+router.get('/:qrCodeId/history', optionalAuth, async (req: Request, res: Response) => {
+  const { qrCodeId } = req.params;
+
+  try {
+    const qrIdentity = await prisma.qrCodeIdentity.findUnique({
+      where: { id: qrCodeId },
+      include: {
+        observations: {
+          orderBy: { createdAt: 'desc' },
+          take: 20,
+          select: {
+            id: true,
+            initialUrl: true,
+            finalUrl: true,
+            finalDomain: true,
+            riskLevel: true,
+            riskScore: true,
+            changeClassification: true,
+            createdAt: true,
+          },
+        },
+        communityReports: {
+          where: { status: { in: ['CONFIRMED', 'PENDING'] } },
+          orderBy: { createdAt: 'desc' },
+          select: {
+            id: true,
+            category: true,
+            description: true,
+            status: true,
+            createdAt: true,
+            // Zero-PII: do not expose userId or reporter details
+          },
+        },
+      },
+    });
+
+    if (!qrIdentity) {
+      sendError(res, 404, 'NOT_FOUND', 'QR Code history not found');
+      return;
+    }
+
+    sendSuccess(res, {
+      qrCodeId: qrIdentity.id,
+      fingerprint: qrIdentity.fingerprint,
+      payloadType: qrIdentity.payloadType,
+      firstSeenAt: qrIdentity.firstSeenAt,
+      lastSeenAt: qrIdentity.lastSeenAt,
+      scanCount: qrIdentity.scanCount,
+      reportCount: qrIdentity.reportCount,
+      reputationScore: qrIdentity.reputationScore,
+      reputationLevel: qrIdentity.reputationLevel,
+      hasCriticalHistory: qrIdentity.hasCriticalHistory,
+      criticalReason: qrIdentity.criticalReason,
+      observations: qrIdentity.observations,
+      reports: qrIdentity.communityReports,
+    });
+  } catch (err) {
+    logger.error('QR history fetch error', { error: (err as Error).message });
+    sendError(res, 500, 'INTERNAL_ERROR', 'Failed to retrieve QR history');
+  }
+});
 
 export default router;

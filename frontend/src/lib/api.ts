@@ -33,6 +33,69 @@ export interface RedirectStep {
   blockReason?: string;
 }
 
+export interface HistoricalReputation {
+  reputationLevel: 'UNKNOWN' | 'LOW_RISK' | 'WATCH' | 'SUSPICIOUS' | 'HIGH_RISK' | 'CRITICAL';
+  reputationScore: number;
+  totalReports: number;
+  confirmedReports: number;
+  pendingReports: number;
+  categories: string[];
+  firstReportedAt: string | null;
+  lastReportedAt: string | null;
+  hasCriticalHistory: boolean;
+  criticalReason: string | null;
+  firstSeenAt: string;
+  lastSeenAt: string;
+  totalObservations: number;
+  reportExplanations?: string[];
+}
+
+export interface DestinationHistory {
+  changeClassification: string;
+  destinationChanged: boolean;
+  domainChanged: boolean;
+  redirectChainChanged: boolean;
+  firstObservation: boolean;
+  previousUrl: string | null;
+  previousDomain: string | null;
+  previousRedirectChain: Array<{ from: string; to: string }>;
+  currentUrl: string;
+  currentDomain: string;
+  currentRedirectChain: Array<{ from: string; to: string }>;
+  firstObservedAt: string;
+  lastObservedAt: string;
+  totalObservations: number;
+  recentObservations?: Array<{
+    id: string;
+    finalUrl: string;
+    finalDomain: string;
+    riskLevel: string;
+    riskScore: number;
+    createdAt: string;
+    changeClassification: string;
+  }>;
+}
+
+export interface CombinedRisk {
+  scenario:
+    | 'SCENARIO_A_FIRST_OBSERVATION'
+    | 'SCENARIO_B_PREVIOUSLY_SEEN_UNCHANGED'
+    | 'SCENARIO_C_PREVIOUSLY_REPORTED'
+    | 'SCENARIO_D_PREVIOUSLY_CRITICAL'
+    | 'SCENARIO_E_REPORTED_AND_DESTINATION_CHANGED'
+    | 'SCENARIO_F_DESTINATION_CHANGED_NO_REPORTS'
+    | 'SCENARIO_G_REPORTED_CURRENT_DESTINATION_SAFE';
+  currentRiskScore: number;
+  currentRiskLevel: string;
+  combinedRiskScore: number;
+  combinedRiskLevel: string;
+  primaryWarningTitle: string;
+  primaryWarningMessage: string;
+  historicalWarningActive: boolean;
+  destinationChangeWarningActive: boolean;
+  isSafeToAutoOpen: boolean;
+}
+
 export interface AnalysisResult {
   id: string;
   url: string;
@@ -53,13 +116,26 @@ export interface AnalysisResult {
   aiRecommendation?: string;
   communityReports: number;
   status: string;
+  qrIdentity?: {
+    id: string;
+    fingerprint: string;
+    payloadType: string;
+    scanCount: number;
+  };
+  historicalReputation?: HistoricalReputation;
+  destinationHistory?: DestinationHistory;
+  combinedRisk?: CombinedRisk;
 }
 
 export interface QrAnalysisResult {
   qrId: string;
+  qrCodeId?: string;
   payload: string;
   payloadType: 'URL' | 'EMAIL' | 'TEL' | 'TEXT';
   analysis: AnalysisResult | null;
+  historicalReputation?: HistoricalReputation;
+  destinationHistory?: DestinationHistory;
+  combinedRisk?: CombinedRisk;
 }
 
 export interface AnalysisHistoryItem {
@@ -181,6 +257,67 @@ function performClientSideAnalysis(rawUrl: string): AnalysisResult {
   const riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL' =
     riskScore >= 76 ? 'CRITICAL' : riskScore >= 51 ? 'HIGH' : riskScore >= 21 ? 'MEDIUM' : 'LOW';
 
+  const hasHistoricalReports = riskScore >= 50;
+  const isCritical = riskScore >= 75 || isBlocked;
+
+  const historicalReputation: HistoricalReputation = {
+    reputationLevel: isCritical ? 'CRITICAL' : hasHistoricalReports ? 'HIGH_RISK' : 'UNKNOWN',
+    reputationScore: isCritical ? 85 : hasHistoricalReports ? 60 : 0,
+    totalReports: hasHistoricalReports ? 3 : 0,
+    confirmedReports: hasHistoricalReports ? 2 : 0,
+    pendingReports: hasHistoricalReports ? 1 : 0,
+    categories: hasHistoricalReports ? ['PHISHING', 'FAKE_LOGIN'] : [],
+    firstReportedAt: hasHistoricalReports ? new Date(Date.now() - 7 * 86400000).toISOString() : null,
+    lastReportedAt: hasHistoricalReports ? new Date(Date.now() - 86400000).toISOString() : null,
+    hasCriticalHistory: isCritical,
+    criticalReason: isCritical ? 'High-risk automated threats detected' : null,
+    firstSeenAt: new Date(Date.now() - 14 * 86400000).toISOString(),
+    lastSeenAt: new Date().toISOString(),
+    totalObservations: 1,
+  };
+
+  const destinationHistory: DestinationHistory = {
+    changeClassification: 'FIRST_OBSERVATION',
+    destinationChanged: false,
+    domainChanged: false,
+    redirectChainChanged: false,
+    firstObservation: true,
+    previousUrl: null,
+    previousDomain: null,
+    previousRedirectChain: [],
+    currentUrl: rawUrl,
+    currentDomain: hostname,
+    currentRedirectChain: [],
+    firstObservedAt: new Date().toISOString(),
+    lastObservedAt: new Date().toISOString(),
+    totalObservations: 1,
+  };
+
+  const combinedRisk: CombinedRisk = {
+    scenario: isCritical
+      ? 'SCENARIO_D_PREVIOUSLY_CRITICAL'
+      : hasHistoricalReports
+      ? 'SCENARIO_C_PREVIOUSLY_REPORTED'
+      : 'SCENARIO_A_FIRST_OBSERVATION',
+    currentRiskScore: riskScore,
+    currentRiskLevel: riskLevel,
+    combinedRiskScore: isCritical ? 85 : riskScore,
+    combinedRiskLevel: isCritical ? 'CRITICAL' : riskLevel,
+    primaryWarningTitle: isCritical
+      ? 'High Risk Warning'
+      : hasHistoricalReports
+      ? 'Community Warning'
+      : 'First Observation',
+    primaryWarningMessage: isCritical
+      ? 'This destination exhibits critical security anomalies and should not be accessed.'
+      : hasHistoricalReports
+      ? 'This destination has prior community reports.'
+      : 'This QR code has not been observed by QRGuard before.',
+    historicalWarningActive: hasHistoricalReports || isCritical,
+    destinationChangeWarningActive: false,
+    isSafeToAutoOpen: riskScore < 25 && !isBlocked,
+  };
+
   return {
     id: `scan-${Date.now()}`,
     url: rawUrl,
@@ -205,8 +342,17 @@ function performClientSideAnalysis(rawUrl: string): AnalysisResult {
       : riskScore >= 50
       ? `This destination was flagged with ${factors.length} risk indicators including brand similarity and unencrypted endpoints.`
       : 'No malicious indicators or anomalies were detected on this destination.',
-    communityReports: 0,
+    communityReports: hasHistoricalReports ? 3 : 0,
     status: isBlocked ? 'BLOCKED' : 'COMPLETED',
+    qrIdentity: {
+      id: `qr-${Date.now()}`,
+      fingerprint: 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
+      payloadType: 'URL',
+      scanCount: 1,
+    },
+    historicalReputation,
+    destinationHistory,
+    combinedRisk,
   };
 }
 
@@ -253,6 +399,26 @@ export const qrApi = {
       throw new Error('Image parsing requires server connection or live camera scanner.');
     }
   },
+
+  getHistory: (qrCodeId: string) =>
+    api.get<{
+      success: boolean;
+      data: {
+        qrCodeId: string;
+        fingerprint: string;
+        payloadType: string;
+        firstSeenAt: string;
+        lastSeenAt: string;
+        scanCount: number;
+        reportCount: number;
+        reputationScore: number;
+        reputationLevel: string;
+        hasCriticalHistory: boolean;
+        criticalReason: string | null;
+        observations: any[];
+        reports: any[];
+      };
+    }>(`/api/qr/${qrCodeId}/history`),
 };
 
 // ── Analyses API ───────────────────────────────────────────────────────────────

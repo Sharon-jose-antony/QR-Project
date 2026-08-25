@@ -4,7 +4,7 @@ import {
   AlertTriangle, XCircle, CheckCircle,
   ExternalLink, ChevronRight, Bot, Flag, Users,
   Lock, ArrowLeft, ChevronDown, ChevronUp, AlertOctagon, Shield,
-  CheckCircle2, Sparkles, Pause, Play
+  CheckCircle2, Sparkles, Pause, Play, History, GitCommit, Copy, Check
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -18,16 +18,25 @@ interface Props {
 export default function AnalysisCard({ result, onReport, onGoBack, autoOpenSafe = true }: Props) {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showTechDetails, setShowTechDetails] = useState(false);
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
+  const [copiedFingerprint, setCopiedFingerprint] = useState(false);
 
   // Auto-open countdown state for safe URLs
   const [countdown, setCountdown] = useState<number>(3);
   const [autoOpenPaused, setAutoOpenPaused] = useState<boolean>(false);
   const [hasAutoOpened, setHasAutoOpened] = useState<boolean>(false);
 
-  const score = result.riskScore;
-  const isSafe = score < 30 && !result.blocked;
-  const isSuspicious = score >= 30 && score < 60 && !result.blocked;
-  const isHighRisk = score >= 60 || result.blocked;
+  const combined = result.combinedRisk;
+  const historical = result.historicalReputation;
+  const drift = result.destinationHistory;
+  const qrIdentity = result.qrIdentity;
+
+  const score = combined ? combined.combinedRiskScore : result.riskScore;
+  const riskLevel = combined ? combined.combinedRiskLevel : result.riskLevel;
+
+  const isSafe = (combined?.isSafeToAutoOpen ?? (score < 30 && !result.blocked)) && !historical?.hasCriticalHistory && (historical?.totalReports || 0) === 0 && !(drift?.destinationChanged);
+  const isSuspicious = !isSafe && score < 70 && !result.blocked;
+  const isHighRisk = score >= 70 || result.blocked || Boolean(historical?.hasCriticalHistory);
 
   const destinationUrl = result.finalUrl || result.url;
 
@@ -62,6 +71,15 @@ export default function AnalysisCard({ result, onReport, onGoBack, autoOpenSafe 
     handleSafeOpen();
   };
 
+  const copyFingerprint = () => {
+    if (qrIdentity?.fingerprint) {
+      navigator.clipboard.writeText(qrIdentity.fingerprint);
+      setCopiedFingerprint(true);
+      toast.success('QR Fingerprint copied to clipboard');
+      setTimeout(() => setCopiedFingerprint(false), 2000);
+    }
+  };
+
   return (
     <div className="analysis-card glass-card animate-fade-up">
       {/* ── 1. GATEWAY DECISION BANNER ───────────────────────────────────────── */}
@@ -82,31 +100,54 @@ export default function AnalysisCard({ result, onReport, onGoBack, autoOpenSafe 
               {isHighRisk && <AlertOctagon size={28} />}
             </div>
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className={`risk-badge ${isSafe ? 'LOW' : isSuspicious ? 'MEDIUM' : 'CRITICAL'}`}>
                   {isSafe ? '🟢 VERIFIED SAFE' : isSuspicious ? '🟡 SUSPICIOUS LINK' : '🔴 HIGH RISK / BLOCKED'}
                 </span>
-                {result.communityReports > 0 && (
-                  <span className="community-flag">
-                    <Flag size={11} /> {result.communityReports} Community Flags
+                {combined?.scenario && (
+                  <span className="badge badge-outline text-xs text-primary font-mono">
+                    {combined.scenario === 'SCENARIO_A_FIRST_OBSERVATION' && '🆕 First Observation'}
+                    {combined.scenario === 'SCENARIO_B_PREVIOUSLY_SEEN_UNCHANGED' && '🟢 Destination Unchanged'}
+                    {combined.scenario === 'SCENARIO_C_PREVIOUSLY_REPORTED' && '🔴 Community Flagged'}
+                    {combined.scenario === 'SCENARIO_D_PREVIOUSLY_CRITICAL' && '⛔ Historical Critical'}
+                    {combined.scenario === 'SCENARIO_E_REPORTED_AND_DESTINATION_CHANGED' && '🚨 Reported + Destination Changed'}
+                    {combined.scenario === 'SCENARIO_F_DESTINATION_CHANGED_NO_REPORTS' && '⚠️ Destination Changed'}
+                    {combined.scenario === 'SCENARIO_G_REPORTED_CURRENT_DESTINATION_SAFE' && '🟡 Reported (Current Safe)'}
                   </span>
+                )}
+                {qrIdentity && (
+                  <button
+                    onClick={() => setShowHistoryModal(true)}
+                    className="badge badge-secondary text-xs flex items-center gap-1 hover:bg-opacity-80 transition cursor-pointer"
+                    title="View QR identity & scan history"
+                  >
+                    <History size={11} /> Scanned {qrIdentity.scanCount || 1}x
+                  </button>
                 )}
               </div>
               <h2 className="text-xl font-bold mt-1">
-                {isSafe && 'Destination verified safe to open.'}
-                {isSuspicious && `QRGuard detected ${result.indicators.length || 1} indicators that may indicate this link is unsafe.`}
-                {isHighRisk && (result.blocked ? 'QRGuard blocked this destination before connection.' : 'High probability of malicious intent, phishing, or fraud.')}
+                {combined?.primaryWarningTitle || (
+                  isSafe ? 'Destination verified safe to open.' :
+                  isSuspicious ? `QRGuard detected ${result.indicators.length || 1} indicators that may indicate this link is unsafe.` :
+                  result.blocked ? 'QRGuard blocked this destination before connection.' : 'High probability of malicious intent, phishing, or fraud.'
+                )}
               </h2>
+              <p className="text-secondary text-xs mt-1 max-w-2xl">
+                {combined?.primaryWarningMessage || result.recommendation}
+              </p>
             </div>
           </div>
 
           <div className="text-right">
-            <div className="text-xs text-muted">Risk Score</div>
+            <div className="text-xs text-muted">Combined Risk</div>
             <div className={`text-2xl font-bold font-mono ${
               isSafe ? 'text-emerald-400' : isSuspicious ? 'text-amber-400' : 'text-rose-400'
             }`}>
               {score}<span className="text-xs text-muted">/100</span>
             </div>
+            {drift?.destinationChanged && (
+              <span className="text-[10px] text-amber-400 font-semibold block mt-0.5">⚠️ Drift Detected</span>
+            )}
           </div>
         </div>
 
@@ -119,7 +160,96 @@ export default function AnalysisCard({ result, onReport, onGoBack, autoOpenSafe 
         </div>
       </div>
 
-      {/* ── 2. AUTO-OPEN POPUP BANNER FOR SAFE DESTINATIONS ──────────────────── */}
+      {/* ── 2. COMMUNITY REPUTATION WARNING BANNER ───────────────────────────── */}
+      {historical && (historical.totalReports > 0 || historical.hasCriticalHistory) && (
+        <div className="p-4 mx-6 mt-6 rounded-xl flex items-start gap-3"
+             style={{
+               background: historical.hasCriticalHistory ? 'rgba(239, 68, 68, 0.12)' : 'rgba(245, 158, 11, 0.12)',
+               border: `1px solid ${historical.hasCriticalHistory ? 'rgba(239, 68, 68, 0.35)' : 'rgba(245, 158, 11, 0.35)'}`
+             }}>
+          <div className={`p-2 rounded-lg ${historical.hasCriticalHistory ? 'bg-rose-500/20 text-rose-400' : 'bg-amber-500/20 text-amber-400'}`}>
+            <Flag size={20} />
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <strong className={`text-sm ${historical.hasCriticalHistory ? 'text-rose-400' : 'text-amber-400'}`}>
+                {historical.hasCriticalHistory ? '🚨 Critical Community Warning' : '⚠️ Prior Community Threat Reports'}
+              </strong>
+              <span className="badge badge-outline text-xs">
+                {historical.totalReports} Total Reports ({historical.confirmedReports} Verified)
+              </span>
+              {historical.reputationLevel && (
+                <span className={`badge text-xs ${historical.hasCriticalHistory ? 'badge-danger' : 'badge-warning'}`}>
+                  Level: {historical.reputationLevel}
+                </span>
+              )}
+            </div>
+            <p className="text-secondary text-xs mt-1">
+              This physical QR code was previously flagged by the security community
+              {historical.categories.length > 0 && ` for ${historical.categories.join(', ')}`}.
+              {historical.firstReportedAt && ` First reported on ${new Date(historical.firstReportedAt).toLocaleDateString()}.`}
+            </p>
+            {historical.criticalReason && (
+              <div className="text-xs font-mono mt-1 text-rose-300">
+                Reason: {historical.criticalReason}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── 3. DESTINATION DRIFT INTELLIGENCE BANNER ─────────────────────────── */}
+      {drift && (
+        <div className="p-4 mx-6 mt-4 rounded-xl flex items-start gap-3"
+             style={{
+               background: drift.destinationChanged ? 'rgba(245, 158, 11, 0.08)' : 'rgba(16, 185, 129, 0.06)',
+               border: `1px solid ${drift.destinationChanged ? 'rgba(245, 158, 11, 0.25)' : 'rgba(16, 185, 129, 0.2)'}`
+             }}>
+          <div className={`p-2 rounded-lg ${drift.destinationChanged ? 'bg-amber-500/20 text-amber-400' : 'bg-emerald-500/20 text-emerald-400'}`}>
+            <GitCommit size={20} />
+          </div>
+          <div className="flex-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <strong className={`text-sm ${drift.destinationChanged ? 'text-amber-400' : 'text-emerald-400'}`}>
+                Destination Intelligence: {drift.changeClassification.replace(/_/g, ' ')}
+              </strong>
+              <span className="text-xs text-muted">
+                Observed {drift.totalObservations} {drift.totalObservations === 1 ? 'time' : 'times'}
+              </span>
+            </div>
+            {drift.destinationChanged ? (
+              <div className="mt-2 text-xs space-y-1">
+                <div className="flex items-center gap-2 text-muted">
+                  <span className="font-semibold text-rose-400">Previous Destination:</span>
+                  <span className="font-mono text-rose-300 truncate max-w-md">{drift.previousUrl || drift.previousDomain}</span>
+                </div>
+                <div className="flex items-center gap-2 text-muted">
+                  <span className="font-semibold text-emerald-400">Current Destination:</span>
+                  <span className="font-mono text-emerald-300 truncate max-w-md">{drift.currentUrl}</span>
+                </div>
+                <p className="text-secondary text-[11px] mt-1">
+                  Destination drift can occur in dynamic QR codes or after an attacker alters the underlying redirect endpoint.
+                </p>
+              </div>
+            ) : (
+              <p className="text-secondary text-xs mt-0.5">
+                {drift.firstObservation
+                  ? 'First recorded observation of this QR code payload by QRGuard.'
+                  : 'Destination matches previously recorded scans without redirect drift.'}
+              </p>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowHistoryModal(true)}
+            className="btn btn-secondary btn-sm text-xs flex items-center gap-1 self-center"
+          >
+            <History size={13} /> History
+          </button>
+        </div>
+      )}
+
+      {/* ── 4. AUTO-OPEN POPUP BANNER FOR SAFE DESTINATIONS ──────────────────── */}
       {isSafe && (
         <div className="p-4 mx-6 mt-6 rounded-xl flex flex-wrap items-center justify-between gap-4 auto-open-banner"
              style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.3)' }}>
@@ -163,7 +293,7 @@ export default function AnalysisCard({ result, onReport, onGoBack, autoOpenSafe 
         </div>
       )}
 
-      {/* ── 3. EXPLICIT YES/NO PERMISSION PROMPT FOR UNSAFE / SUSPICIOUS LINKS ─ */}
+      {/* ── 5. EXPLICIT YES/NO PERMISSION PROMPT FOR UNSAFE / SUSPICIOUS LINKS ─ */}
       {(isSuspicious || isHighRisk) && (
         <div className="p-5 mx-6 mt-6 rounded-xl"
              style={{
@@ -218,7 +348,7 @@ export default function AnalysisCard({ result, onReport, onGoBack, autoOpenSafe 
         </div>
       )}
 
-      {/* ── 4. DESTINATION INFORMATION ────────────────────────────────────────── */}
+      {/* ── 6. DESTINATION INFORMATION ────────────────────────────────────────── */}
       <div className="p-6">
         <div className="mb-6">
           <label className="text-xs font-semibold uppercase tracking-wider text-muted block mb-1">
@@ -262,7 +392,7 @@ export default function AnalysisCard({ result, onReport, onGoBack, autoOpenSafe 
           <div className="stat-item">
             <span className="stat-label">Community Reputation</span>
             <span className="stat-value flex items-center gap-1">
-              <Users size={12} /> {result.communityReports} Flags
+              <Users size={12} /> {historical?.totalReports || result.communityReports} Flags
             </span>
           </div>
         </div>
@@ -302,7 +432,7 @@ export default function AnalysisCard({ result, onReport, onGoBack, autoOpenSafe 
           </div>
         )}
 
-        {/* ── 5. SECONDARY ACTIONS ────────────────────────────────────────────── */}
+        {/* ── 7. SECONDARY ACTIONS ────────────────────────────────────────────── */}
         <div className="p-4 rounded-xl flex flex-wrap items-center justify-between gap-4 mt-6"
              style={{ background: 'rgba(255, 255, 255, 0.02)', border: '1px solid var(--color-border)' }}>
           <div className="flex items-center gap-3">
@@ -325,7 +455,7 @@ export default function AnalysisCard({ result, onReport, onGoBack, autoOpenSafe 
           </div>
         </div>
 
-        {/* ── 6. TECHNICAL SECURITY DETAILS ACCORDION ─────────────────────────── */}
+        {/* ── 8. TECHNICAL SECURITY DETAILS ACCORDION ─────────────────────────── */}
         <div className="mt-8 pt-4 border-t" style={{ borderColor: 'var(--color-border)' }}>
           <button
             onClick={() => setShowTechDetails(v => !v)}
@@ -340,6 +470,17 @@ export default function AnalysisCard({ result, onReport, onGoBack, autoOpenSafe 
           {showTechDetails && (
             <div className="mt-4 p-4 rounded-lg text-xs font-mono space-y-2.5"
                  style={{ background: 'rgba(0, 0, 0, 0.4)', border: '1px solid var(--color-border)' }}>
+              {qrIdentity && (
+                <div className="flex justify-between items-center">
+                  <span className="text-muted">QR Fingerprint:</span>
+                  <span className="text-primary flex items-center gap-1">
+                    {qrIdentity.fingerprint.substring(0, 16)}…
+                    <button onClick={copyFingerprint} className="text-muted hover:text-white" title="Copy full SHA-256 fingerprint">
+                      {copiedFingerprint ? <Check size={12} className="text-success" /> : <Copy size={12} />}
+                    </button>
+                  </span>
+                </div>
+              )}
               <div className="flex justify-between">
                 <span className="text-muted">SSRF Protection:</span>
                 <span className="text-emerald-400">Enforced (Dual-Stack RFC1918/6598/Link-Local/Metadata CIDR)</span>
@@ -357,14 +498,6 @@ export default function AnalysisCard({ result, onReport, onGoBack, autoOpenSafe 
                 <span className="text-emerald-400">Manual Hop Validation (Max 5, Public-to-Private Blocked)</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted">Buffer &amp; Time Limits:</span>
-                <span className="text-emerald-400">1MB Max Body, 10,000ms Timeout</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted">Resolved IP(s):</span>
-                <span className="text-primary">{result.resolvedIPs?.join(', ') || 'Classified Pre-Socket'}</span>
-              </div>
-              <div className="flex justify-between">
                 <span className="text-muted">Analysis Status:</span>
                 <span className="text-primary">{result.status || 'COMPLETED'}</span>
               </div>
@@ -373,7 +506,84 @@ export default function AnalysisCard({ result, onReport, onGoBack, autoOpenSafe 
         </div>
       </div>
 
-      {/* ── 7. "OPEN ANYWAY" CONFIRMATION MODAL FOR UNSAFE DESTINATIONS ──────── */}
+      {/* ── 9. QR IDENTITY & OBSERVATION HISTORY MODAL ───────────────────────── */}
+      {showHistoryModal && (
+        <div className="modal-overlay" onClick={() => setShowHistoryModal(false)}>
+          <div className="modal-card glass-card" onClick={e => e.stopPropagation()} style={{ maxWidth: 540 }}>
+            <div className="flex items-center justify-between mb-4 border-b pb-3 border-border">
+              <div className="flex items-center gap-2">
+                <History size={20} className="text-primary" />
+                <h3 style={{ margin: 0 }}>QR Observation &amp; Reputation History</h3>
+              </div>
+              <button onClick={() => setShowHistoryModal(false)} className="text-muted hover:text-white">
+                <XCircle size={18} />
+              </button>
+            </div>
+
+            <div className="space-y-4 text-xs">
+              {qrIdentity && (
+                <div className="p-3 rounded bg-black/40 border border-border">
+                  <div className="text-muted text-[10px] uppercase font-semibold">QR Code SHA-256 Fingerprint</div>
+                  <div className="font-mono text-primary break-all mt-1 flex items-center justify-between">
+                    <span>{qrIdentity.fingerprint}</span>
+                    <button onClick={copyFingerprint} className="btn btn-secondary btn-sm p-1 ml-2">
+                      {copiedFingerprint ? <Check size={12} className="text-success" /> : <Copy size={12} />}
+                    </button>
+                  </div>
+                  <div className="flex justify-between text-muted mt-2 pt-2 border-t border-border/50 text-[11px]">
+                    <span>Total Scans: <strong>{qrIdentity.scanCount}</strong></span>
+                    <span>Payload: <strong>{qrIdentity.payloadType}</strong></span>
+                    <span>Reputation: <strong className={historical?.hasCriticalHistory ? 'text-danger' : 'text-success'}>{historical?.reputationLevel || 'UNKNOWN'}</strong></span>
+                  </div>
+                </div>
+              )}
+
+              <div>
+                <h4 className="font-semibold text-sm mb-2 text-white">Recent Destination Observations</h4>
+                {drift?.recentObservations && drift.recentObservations.length > 0 ? (
+                  <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                    {drift.recentObservations.map((obs, idx) => (
+                      <div key={idx} className="p-2.5 rounded bg-black/30 border border-border flex items-center justify-between">
+                        <div>
+                          <div className="font-mono text-white text-xs truncate max-w-xs">{obs.finalUrl}</div>
+                          <div className="text-[10px] text-muted mt-0.5">
+                            {new Date(obs.createdAt).toLocaleString()} • {obs.changeClassification}
+                          </div>
+                        </div>
+                        <span className={`risk-badge text-[10px] ${obs.riskLevel}`}>
+                          {obs.riskLevel}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-muted p-3 bg-black/20 rounded text-center">
+                    This is the first observation recorded for this QR code.
+                  </div>
+                )}
+              </div>
+
+              {historical && historical.totalReports > 0 && (
+                <div>
+                  <h4 className="font-semibold text-sm mb-2 text-white">Community Report Telemetry</h4>
+                  <div className="p-3 rounded bg-rose-950/20 border border-rose-500/30 text-rose-300">
+                    <div>{historical.totalReports} threat reports filed ({historical.confirmedReports} confirmed by moderation).</div>
+                    <div className="mt-1">Categories: {historical.categories.join(', ')}</div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="mt-6 flex justify-end">
+              <button type="button" onClick={() => setShowHistoryModal(false)} className="btn btn-secondary">
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── 10. "OPEN ANYWAY" CONFIRMATION MODAL FOR UNSAFE DESTINATIONS ──────── */}
       {showConfirmModal && (
         <div className="modal-overlay" onClick={() => setShowConfirmModal(false)}>
           <div className="modal-card glass-card" onClick={e => e.stopPropagation()} style={{ maxWidth: 460 }}>
@@ -388,7 +598,7 @@ export default function AnalysisCard({ result, onReport, onGoBack, autoOpenSafe 
             </div>
 
             <p className="text-secondary text-sm mb-4" style={{ lineHeight: 1.6 }}>
-              This destination has been flagged as <strong>{result.riskLevel}</strong> risk ({result.riskScore}/100). 
+              This destination has been flagged as <strong>{riskLevel}</strong> risk ({score}/100). 
               Opening it may expose your device to credential phishing, malware downloads, or payment fraud.
             </p>
 
