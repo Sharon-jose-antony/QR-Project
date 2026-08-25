@@ -197,6 +197,39 @@ export default function ScanPage() {
     }
   };
 
+  const decodeQRFromImageFile = (imageFile: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d', { willReadFrequently: true });
+          if (!ctx) {
+            reject(new Error('Canvas rendering context not available'));
+            return;
+          }
+          ctx.drawImage(img, 0, 0, img.width, img.height);
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const code = jsQR(imageData.data, imageData.width, imageData.height, {
+            inversionAttempts: 'attemptBoth',
+          });
+          if (code && code.data && code.data.trim()) {
+            resolve(code.data.trim());
+          } else {
+            reject(new Error('No clear QR code detected in the uploaded image.'));
+          }
+        };
+        img.onerror = () => reject(new Error('Failed to load image file.'));
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = () => reject(new Error('Failed to read file.'));
+      reader.readAsDataURL(imageFile);
+    });
+  };
+
   const handleUploadScan = async () => {
     if (!file) return;
     setLoading(true);
@@ -206,20 +239,28 @@ export default function ScanPage() {
     setRawPayload(null);
 
     try {
-      const res = await qrApi.analyze(file);
-      const data: QrAnalysisResult = res.data.data;
-      setRawPayload(data.payload);
-      setPayloadType(data.payloadType);
-      if (data.analysis) {
-        setResult(data.analysis);
+      // 1. Try in-browser canvas decoding with jsQR (works 100% on GitHub Pages & offline!)
+      const decodedText = await decodeQRFromImageFile(file);
+      toast.success('QR Code successfully decoded!');
+      await handleDecodedQR(decodedText);
+    } catch {
+      // 2. Fallback to server API if available
+      try {
+        const res = await qrApi.analyze(file);
+        const data: QrAnalysisResult = res.data.data;
+        setRawPayload(data.payload);
+        setPayloadType(data.payloadType);
+        if (data.analysis) {
+          setResult(data.analysis);
+        }
+      } catch (err: any) {
+        const msg =
+          err?.response?.data?.error?.message ||
+          err?.response?.data?.message ||
+          'Scan failed. Please verify that the image contains a clear QR code.';
+        setError(msg);
+        toast.error(msg);
       }
-    } catch (err: any) {
-      const msg =
-        err?.response?.data?.error?.message ||
-        err?.response?.data?.message ||
-        'Scan failed. Please verify that the image contains a clear QR code.';
-      setError(msg);
-      toast.error(msg);
     } finally {
       setLoading(false);
     }
