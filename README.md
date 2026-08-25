@@ -57,10 +57,17 @@ COMMUNITY INTELLIGENCE (Crowdsourced Reports & Reputation)
 - **Claude Assistant:** Translates technical telemetry (DNS, redirects, entropy, SSL status) into actionable, plain-language explanations for users.
 - **Prompt Injection Defense:** Webpage content is treated strictly as untrusted text payloads and isolated from system instructions.
 
-### 4. Community Feedback Loop & Reputation
-- Community members can flag deceptive links under categories: *Phishing, Fake Login, Fake Payment / Quishing, Brand Impersonation, Malware, Scam, Malvertising*.
-- Telemetry is automatically scrubbed of personal tokens and session identifiers.
-- Accumulated flags elevate domain reputation scores and alert subsequent community users.
+### 5. Persistent QR Reputation & Destination Intelligence
+- **Deterministic QR Fingerprinting:** Canonical payload SHA-256 identification recognizes the same physical QR code across time even if destination redirects change.
+- **Destination Drift Detection:** Tracks runtime observation history and flags endpoint shifts (`FIRST_OBSERVATION`, `NO_CHANGE`, `FINAL_DESTINATION_CHANGED`, `DOMAIN_CHANGED`, `SCHEME_CHANGED`, `PORT_CHANGED`, `REDIRECT_CHAIN_CHANGED`).
+- **Separated Historical vs. Current Signals (Scenarios A–G):** Evaluates prior community threat reports independently from current technical endpoint scans.
+
+---
+
+## 🌐 Live Deployments
+
+- **Vercel Full-Stack Production:** [https://qrguard-eta.vercel.app](https://qrguard-eta.vercel.app)
+- **GitHub Pages Showcase:** [https://sharon-jose-antony.github.io/QR-Project/](https://sharon-jose-antony.github.io/QR-Project/)
 
 ---
 
@@ -74,7 +81,7 @@ COMMUNITY INTELLIGENCE (Crowdsourced Reports & Reputation)
 ```bash
 cd backend
 npm install
-npx prisma migrate dev
+npx prisma db push
 npm run dev
 ```
 Backend runs at `http://localhost:3001` with an automated `/health` check.
@@ -91,18 +98,19 @@ Frontend runs at `http://localhost:5173` with reverse-proxy configured to `/api`
 
 ## 🧪 Running Automated Security Tests
 
-QRGuard includes a dedicated automated security test suite (`backend/tests/security/*`) covering SSRF, CSRF, IDOR, Password Security, File Uploads, XSS, and SQL Injection:
+QRGuard includes a dedicated automated security test suite (`backend/tests/security/*`) covering SSRF, CSRF, IDOR, Password Security, File Uploads, XSS, SQL Injection, and Persistent QR Reputation:
 
 ```bash
 cd backend
 npm test
 ```
 
-**Results:** 10/10 Test Suites Passed · 110/110 Automated Tests Passing (100% Green).
+**Results:** 11/11 Test Suites Passed · 130/130 Automated Tests Passing (100% Green).
 
 ---
 
 ## 📚 Technical Documentation
+- [Persistent QR Reputation & Destination Intelligence](docs/QR_REPUTATION.md)
 - [Architecture & Threat Model](docs/ARCHITECTURE.md)
 - [Security Defenses & Policies](docs/SECURITY.md)
 - [Comprehensive Security Audit](docs/SECURITY_AUDIT.md)
