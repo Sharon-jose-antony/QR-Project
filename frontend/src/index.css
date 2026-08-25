@@ -700,23 +700,23 @@ code, pre { font-family: var(--font-mono); }
 }
 .app-main { flex: 1; }
 
-/* ── Navbar: Crisp White with Clean Border & Obsidian Branding ──── */
+/* ── Navbar: Obsidian Glass with Glowing Scanzo Logo & Calm Emerald Accents ──── */
 .navbar {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--border-subtle);
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  background: rgba(9, 13, 22, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 .navbar-inner {
   display: flex;
   align-items: center;
-  height: 64px;
+  height: 68px;
   gap: 2rem;
 }
 .navbar-logo {
@@ -725,7 +725,7 @@ code, pre { font-family: var(--font-mono); }
   gap: 0.5rem;
   font-size: 1.15rem;
   font-weight: 800;
-  color: var(--text-primary);
+  color: #FFFFFF;
   text-decoration: none;
   white-space: nowrap;
   letter-spacing: -0.02em;
@@ -754,13 +754,19 @@ code, pre { font-family: var(--font-mono); }
   padding: 0.45rem 0.95rem;
   border-radius: var(--radius-md);
   font-size: 0.9375rem;
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.72);
   text-decoration: none;
   transition: all var(--transition-fast);
   font-weight: 500;
 }
-.nav-link:hover { color: var(--text-primary); background: #f1f5f9; }
-.nav-link.active { color: #047857; background: #ecfdf5; font-weight: 600; }
+.nav-link:hover {
+  color: #FFFFFF;
+  background: rgba(255, 255, 255, 0.06);
+}
+.nav-link.active {
+  color: #10B981;
+  background: rgba(16, 185, 129, 0.12);
+  font-weight: 600;
 .navbar-actions {
   display: flex;
   align-items: center;
