@@ -23,6 +23,7 @@ model User {
 
   sessions         Session[]
   qrSubmissions    QrSubmission[]
+  qrObservations   QrObservation[]
   urlAnalyses      UrlAnalysis[]
   communityReports CommunityReport[]
   auditLogs        AuditLog[]
@@ -51,20 +52,80 @@ model Session {
 
 // ─── QR / URL Analysis ───────────────────────────────────────────────────────
 
+model QrCodeIdentity {
+  id                 String    @id @default(uuid())
+  fingerprint        String    @unique // SHA-256 hash of canonical raw payload
+  rawPayload         String
+  payloadType        String    @default("URL") // URL | TEXT | EMAIL | TEL | UPI
+  firstSeenAt        DateTime  @default(now())
+  lastSeenAt         DateTime  @default(now())
+  scanCount          Int       @default(1)
+  reputationScore    Int       @default(0) // 0 (clean) to 100 (critical)
+  reputationLevel    String    @default("UNKNOWN") // UNKNOWN | LOW_RISK | WATCH | SUSPICIOUS | HIGH_RISK | CRITICAL
+  hasCriticalHistory Boolean   @default(false)
+  criticalReason     String?
+  firstReportedAt    DateTime?
+  lastReportedAt     DateTime?
+  reportCount        Int       @default(0)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  observations     QrObservation[]
+  communityReports CommunityReport[]
+  qrSubmissions    QrSubmission[]
+
+  @@index([fingerprint])
+  @@index([reputationLevel])
+  @@index([hasCriticalHistory])
+  @@index([reportCount])
+  @@index([lastSeenAt])
+}
+
+model QrObservation {
+  id                   String   @id @default(uuid())
+  qrCodeId             String
+  userId               String?
+  sessionRef           String?
+  initialUrl           String
+  finalUrl             String
+  finalDomain          String
+  redirectChain        String   @default("[]") // JSON array of hops
+  riskScore            Int      @default(0)
+  riskLevel            String   @default("LOW")
+  changeClassification String   @default("FIRST_OBSERVATION") // FIRST_OBSERVATION | NO_CHANGE | REDIRECT_CHAIN_CHANGED | FINAL_DESTINATION_CHANGED | DOMAIN_CHANGED | SCHEME_CHANGED | PORT_CHANGED | BLOCKED_DESTINATION | DESTINATION_UNAVAILABLE
+  destinationChanged   Boolean  @default(false)
+  domainChanged        Boolean  @default(false)
+  redirectChainChanged Boolean  @default(false)
+  analysisId           String?
+  createdAt            DateTime @default(now())
+
+  qrCode   QrCodeIdentity @relation(fields: [qrCodeId], references: [id], onDelete: Cascade)
+  user     User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+  analysis UrlAnalysis?   @relation(fields: [analysisId], references: [id], onDelete: SetNull)
+
+  @@index([qrCodeId])
+  @@index([userId])
+  @@index([changeClassification])
+  @@index([createdAt])
+}
+
 model QrSubmission {
   id           String   @id @default(uuid())
   userId       String?
+  qrCodeId     String?
   fileUploadId String?
   payloadType  String
   payload      String
   analysisId   String?
   createdAt    DateTime @default(now())
 
-  user     User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
-  upload   FileUpload?  @relation(fields: [fileUploadId], references: [id])
-  analysis UrlAnalysis? @relation(fields: [analysisId], references: [id])
+  user     User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  qrCode   QrCodeIdentity? @relation(fields: [qrCodeId], references: [id], onDelete: SetNull)
+  upload   FileUpload?     @relation(fields: [fileUploadId], references: [id])
+  analysis UrlAnalysis?    @relation(fields: [analysisId], references: [id])
 
   @@index([userId])
+  @@index([qrCodeId])
   @@index([createdAt])
   @@index([payloadType])
 }
@@ -78,9 +139,9 @@ model UrlAnalysis {
   scheme        String
   port          Int?
   riskScore     Int      @default(0)
-  riskLevel     String   @default("LOW")    // LOW | MEDIUM | HIGH | CRITICAL
+  riskLevel     String   @default("LOW") // LOW | MEDIUM | HIGH | CRITICAL
   redirectCount Int      @default(0)
-  indicators    String   @default("[]")     // JSON array stored as text
+  indicators    String   @default("[]") // JSON array stored as text
   status        String   @default("PENDING") // PENDING | COMPLETED | FAILED | BLOCKED
   aiSummary     String?
   aiRiskExplain String?
@@ -90,8 +151,9 @@ model UrlAnalysis {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
-  user           User?                @relation(fields: [userId], references: [id], onDelete: SetNull)
+  user           User?                 @relation(fields: [userId], references: [id], onDelete: SetNull)
   redirects      RedirectObservation[]
+  qrObservations QrObservation[]
   riskAssessment RiskAssessment?
   qrSubmissions  QrSubmission[]
   securityEvents SecurityEvent[]
@@ -145,6 +207,7 @@ model CommunityReport {
   id           String   @id @default(uuid())
   userId       String
   domainId     String?
+  qrCodeId     String?
   targetUrl    String
   targetDomain String
   category     String
@@ -155,10 +218,12 @@ model CommunityReport {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  domain Domain? @relation(fields: [domainId], references: [id])
+  user   User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  domain Domain?         @relation(fields: [domainId], references: [id])
+  qrCode QrCodeIdentity? @relation(fields: [qrCodeId], references: [id])
 
   @@index([userId])
+  @@index([qrCodeId])
   @@index([targetDomain])
   @@index([status])
   @@index([createdAt])

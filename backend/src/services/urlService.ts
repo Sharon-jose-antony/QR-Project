@@ -13,6 +13,9 @@ import { audit, AUDIT_ACTIONS } from '../security/logging/auditLogger';
 import { getRiskLevel } from '../config/security';
 import { logger } from '../utils/logger';
 import { getAIExplanation } from '../ai/claudeClient';
+import { resolveQrIdentity, QrIdentityResult } from '../security/qr/qrIdentity';
+import { evaluateAndRecordDestinationDrift, DestinationHistoryResult } from '../security/qr/destinationDrift';
+import { calculateQrReputation, combineSignals, HistoricalReputationResult, ScenarioClassification } from '../security/qr/qrReputationEngine';
 
 const prisma = new PrismaClient();
 
@@ -20,6 +23,8 @@ export interface AnalysisOptions {
   userId?: string;
   sessionRef?: string;
   requestIp?: string;
+  qrPayload?: string;
+  qrCodeId?: string;
 }
 
 export interface AnalysisResult {
@@ -40,6 +45,24 @@ export interface AnalysisResult {
   aiRecommendation?: string;
   communityReports: number;
   status: string;
+  qrIdentity?: {
+    id: string;
+    fingerprint: string;
+    payloadType: string;
+    scanCount: number;
+  };
+  historicalReputation?: HistoricalReputationResult;
+  destinationHistory?: DestinationHistoryResult;
+  combinedRisk?: {
+    scenario: ScenarioClassification;
+    combinedRiskScore: number;
+    combinedRiskLevel: string;
+    primaryWarningTitle: string;
+    primaryWarningMessage: string;
+    historicalWarningActive: boolean;
+    destinationChangeWarningActive: boolean;
+    isSafeToAutoOpen: boolean;
+  };
 }
 
 export async function analyzeUrl(rawUrl: string, options: AnalysisOptions = {}): Promise<AnalysisResult> {
@@ -204,7 +227,35 @@ export async function analyzeUrl(rawUrl: string, options: AnalysisOptions = {}):
     },
   });
 
-  // ── Step 10: Create threat relations ──────────────────────────────────────
+  // ── Step 10: QR Identity & Historical Reputation ────────────────────────
+  const qrPayload = options.qrPayload || rawUrl;
+  const qrIdentityResult = await resolveQrIdentity(qrPayload);
+  const qrIdentity = qrIdentityResult.identity;
+  const historicalReputation = await calculateQrReputation(qrIdentity.id);
+
+  // ── Step 11: Destination Drift & History Analysis ────────────────────────
+  const destinationHistory = await evaluateAndRecordDestinationDrift({
+    qrCodeId: qrIdentity.id,
+    userId: options.userId,
+    sessionRef: options.sessionRef,
+    initialUrl: normalizedUrl!,
+    finalUrl: fetchResult.finalUrl || normalizedUrl!,
+    finalDomain: fetchResult.finalUrl ? extractDomain(new URL(fetchResult.finalUrl).hostname) : hostname!,
+    redirectChain: fetchResult.redirectChain,
+    riskScore: riskResult.finalScore,
+    riskLevel: riskResult.riskLevel,
+    analysisId: analysis.id,
+    isBlocked: fetchResult.blocked,
+  });
+
+  // ── Step 12: Combine Historical & Current Signals ────────────────────────
+  const combinedRisk = combineSignals(
+    historicalReputation,
+    destinationHistory,
+    { riskScore: riskResult.finalScore, riskLevel: riskResult.riskLevel, blocked: fetchResult.blocked }
+  );
+
+  // ── Step 13: Create threat relations ──────────────────────────────────────
   await prisma.threatRelation.create({
     data: {
       sourceType: 'URL_ANALYSIS',
@@ -215,7 +266,7 @@ export async function analyzeUrl(rawUrl: string, options: AnalysisOptions = {}):
     },
   });
 
-  // ── Step 11: Audit log ─────────────────────────────────────────────────────
+  // ── Step 14: Audit log ─────────────────────────────────────────────────────
   await audit({
     userId: options.userId,
     action: AUDIT_ACTIONS.URL_ANALYZED,
@@ -225,10 +276,11 @@ export async function analyzeUrl(rawUrl: string, options: AnalysisOptions = {}):
       domain: hostname!,
       riskLevel: riskResult.riskLevel,
       riskScore: riskResult.finalScore,
+      scenario: combinedRisk.scenario,
     },
   });
 
-  // ── Step 12: Get AI explanation (non-blocking, optional) ──────────────────
+  // ── Step 15: Get AI explanation (non-blocking, optional) ──────────────────
   let aiSummary: string | undefined;
   let aiRiskExplanation: string | undefined;
   let aiRecommendation: string | undefined;
@@ -285,5 +337,14 @@ export async function analyzeUrl(rawUrl: string, options: AnalysisOptions = {}):
     aiRecommendation,
     communityReports: communityReportCount,
     status: analysis.status,
+    qrIdentity: {
+      id: qrIdentity.id,
+      fingerprint: qrIdentity.fingerprint,
+      payloadType: qrIdentity.payloadType,
+      scanCount: qrIdentity.scanCount,
+    },
+    historicalReputation,
+    destinationHistory,
+    combinedRisk,
   };
 }

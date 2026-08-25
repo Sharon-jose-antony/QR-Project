@@ -14,6 +14,9 @@ import { sendSuccess, sendError, sendNotFound } from '../utils/response';
 import { audit, AUDIT_ACTIONS } from '../security/logging/auditLogger';
 import { logger } from '../utils/logger';
 
+import { resolveQrIdentity } from '../security/qr/qrIdentity';
+import { calculateQrReputation } from '../security/qr/qrReputationEngine';
+
 const router = Router();
 const prisma = new PrismaClient();
 
@@ -22,9 +25,11 @@ const ReportSchema = z.object({
   category: z.enum([
     'SUSPICIOUS_URL', 'SUSPICIOUS_QR', 'PHISHING', 'FAKE_PAYMENT',
     'IMPERSONATION', 'SUSPICIOUS_ADVERTISEMENT', 'SCAM', 'FAKE_LOGIN',
-    'FAKE_SCHOLARSHIP', 'MALWARE', 'OTHER'
+    'FAKE_SCHOLARSHIP', 'MALWARE', 'SUSPICIOUS_REDIRECT', 'DESTINATION_CHANGED', 'OTHER'
   ]),
   description: z.string().max(1000).optional(),
+  qrCodeId: z.string().optional(),
+  qrPayload: z.string().optional(),
 });
 
 // ── GET /api/community ─────────────────────────────────────────────────────────
@@ -90,10 +95,34 @@ const handleReportSubmission = async (req: Request, res: Response): Promise<void
     return;
   }
 
-  const { targetUrl, category, description } = parsed.data;
+  const { targetUrl, category, description, qrCodeId, qrPayload } = parsed.data;
+  const userId = req.session?.userId;
 
   try {
     const hostname = new URL(targetUrl).hostname.toLowerCase();
+
+    // Anti-abuse: Check duplicate report by same user in last 10 minutes
+    if (userId) {
+      const recentDuplicate = await prisma.communityReport.findFirst({
+        where: {
+          userId,
+          targetUrl,
+          createdAt: { gt: new Date(Date.now() - 10 * 60 * 1000) },
+        },
+      });
+      if (recentDuplicate) {
+        sendError(res, 429, 'DUPLICATE_REPORT', 'You have already submitted a threat report for this destination recently.');
+        return;
+      }
+    }
+
+    // Resolve or find QR code identity
+    let resolvedQrId = qrCodeId;
+    if (!resolvedQrId) {
+      const payloadToResolve = qrPayload || targetUrl;
+      const { identity } = await resolveQrIdentity(payloadToResolve);
+      resolvedQrId = identity.id;
+    }
 
     // Find or create domain record
     const domainRecord = await prisma.domain.upsert({
@@ -110,8 +139,9 @@ const handleReportSubmission = async (req: Request, res: Response): Promise<void
 
     const report = await prisma.communityReport.create({
       data: {
-        userId: req.session.userId!,
+        userId: userId || 'anonymous',
         domainId: domainRecord.id,
+        qrCodeId: resolvedQrId,
         targetUrl: targetUrl.substring(0, 2048),
         targetDomain: hostname,
         category,
@@ -120,16 +150,22 @@ const handleReportSubmission = async (req: Request, res: Response): Promise<void
       },
     });
 
+    // Update QR Code persistent reputation
+    if (resolvedQrId) {
+      await calculateQrReputation(resolvedQrId);
+    }
+
     await audit({
-      userId: req.session.userId,
+      userId: req.session?.userId,
       action: AUDIT_ACTIONS.REPORT_CREATED,
       resource: 'CommunityReport',
       resourceId: report.id,
-      metadata: { domain: hostname, category },
+      metadata: { domain: hostname, category, qrCodeId: resolvedQrId },
     });
 
     sendSuccess(res, {
       id: report.id,
+      qrCodeId: resolvedQrId,
       message: 'Report submitted successfully. Thank you for helping protect the community.',
     }, 201);
   } catch (err) {
