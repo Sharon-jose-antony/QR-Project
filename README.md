@@ -2,7 +2,20 @@
 
 > **"Scan it. Check it. Then open it."**
 
+[![Live App on Vercel](https://img.shields.io/badge/Vercel-qr--project1--gamma.vercel.app-blue?style=flat&logo=vercel)](https://qr-project1-gamma.vercel.app/)
+[![Live App on GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live-green?style=flat&logo=github)](https://sharon-jose-antony.github.io/QR-Project/)
+[![Live Spring Boot Backend on Render](https://img.shields.io/badge/Render-Spring%20Boot%203-46E3B7?style=flat&logo=render)](https://qr-project-1-0nv6.onrender.com/health)
+
 QRGuard is a community-driven digital safety gateway that acts as a secure checkpoint between users and untrusted digital destinations. Whether scanning a physical QR code at a tea stall or opening a suspicious SMS link, QRGuard analyzes the destination, explains potential security risks in plain language, incorporates community threat telemetry, and requires explicit user consent before navigation.
+
+---
+
+## 🌐 Live Production Deployments
+
+- **Live Web App (Vercel):** [https://qr-project1-gamma.vercel.app/](https://qr-project1-gamma.vercel.app/)
+- **Live Web App (GitHub Pages):** [https://sharon-jose-antony.github.io/QR-Project/](https://sharon-jose-antony.github.io/QR-Project/)
+- **Live Spring Boot 3 Backend (Render):** [https://qr-project-1-0nv6.onrender.com/](https://qr-project-1-0nv6.onrender.com/health)
+- **GitHub Repository:** [https://github.com/Sharon-jose-antony/QR-Project](https://github.com/Sharon-jose-antony/QR-Project)
 
 ---
 
