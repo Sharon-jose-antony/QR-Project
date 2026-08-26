@@ -1,0 +1,2572 @@
+============================================================
+SCANZO — MASTER PROJECT IMPLEMENTATION PROMPT
+============================================================
+
+ROLE
+============================================================
+
+You are a senior full-stack software engineer, application security
+engineer, UX designer, database architect, QA engineer, and technical
+project reviewer.
+
+You are working inside an existing project workspace using an IDE/agent
+environment such as Antigravity.
+
+Your task is NOT to create a mockup, static frontend, landing page,
+documentation-only project, or superficial demonstration.
+
+Your task is to BUILD, COMPLETE, TEST, DEBUG, SECURITY-HARDEN, and
+VALIDATE a complete working web application called:
+
+                    SCANZO
+
+Project title:
+
+"SCANZO: Community Digital Safety Gateway for QR and Link Security"
+
+The project is being developed for:
+
+Course:
+Web Exploitation and Defense
+
+Course Code:
+23CY506
+
+Student:
+Sharon Jose Antony B
+
+Programme:
+B.Tech / B.E. CSE (Cyber Security)
+
+Year:
+3rd Year
+
+The project must demonstrate both:
+
+1. A useful real-world community-oriented application
+2. Practical web exploitation defense techniques
+
+The application must be logically defensible during a project review,
+demo, viva, and technical evaluation.
+
+============================================================
+IMPORTANT WORKING RULE
+============================================================
+
+DO NOT blindly generate files.
+
+FIRST inspect the entire existing repository.
+
+Understand:
+
+- current frontend
+- current backend
+- current database
+- current authentication
+- current API routes
+- current environment variables
+- current deployment configuration
+- current UI
+- existing features
+- existing bugs
+- existing security controls
+- existing dependencies
+- existing schema
+- existing components
+- existing test files
+
+Do not unnecessarily rewrite working code.
+
+If something is already implemented correctly, preserve it and improve
+only where necessary.
+
+If something is incomplete, implement it properly.
+
+If something is fake, simulated, hardcoded, or misleading, replace it
+with a real implementation.
+
+============================================================
+CORE PRODUCT IDEA
+============================================================
+
+SCANZO is a community-powered QR and URL safety gateway.
+
+The problem:
+
+QR codes are increasingly used in:
+
+- restaurants
+- payments
+- parking
+- public notices
+- college campuses
+- events
+- advertisements
+- posters
+- transportation
+- websites
+- product packaging
+- social media
+
+A QR code itself may look harmless while its encoded destination may
+lead to:
+
+- phishing pages
+- credential theft
+- impersonation sites
+- malicious downloads
+- scam websites
+- suspicious redirects
+- fake payment pages
+- shortened URLs
+- deceptive domains
+- compromised websites
+- dangerous redirects
+
+Normal QR scanners generally prioritize convenience.
+
+SCANZO prioritizes:
+
+                    SCAN
+                      ↓
+                  ANALYZE
+                      ↓
+                  EXPLAIN
+                      ↓
+             LET USER DECIDE
+
+The user must NOT be blindly redirected immediately.
+
+SCANZO should inspect the destination before opening it.
+
+============================================================
+MAIN PRODUCT PROMISE
+============================================================
+
+SCANZO should answer:
+
+"Where will this QR code actually take me, and does the community
+and security analysis indicate that I should trust it?"
+
+The user should receive a clear explanation rather than only:
+
+SAFE / UNSAFE
+
+The application should explain WHY a destination is considered
+safe, suspicious, or dangerous.
+
+============================================================
+PRIMARY USER FLOW
+============================================================
+
+Implement this complete flow:
+
+USER
+  ↓
+SCANZO FRONTEND
+  ↓
+QR DECODER
+  ↓
+INPUT VALIDATION
+  ↓
+URL NORMALIZATION
+  ↓
+DESTINATION ANALYSIS
+  ↓
+REDIRECT / DOMAIN / URL ANALYSIS
+  ↓
+DATABASE LOOKUP
+  ↓
+COMMUNITY REPORT LOOKUP
+  ↓
+HISTORICAL DESTINATION CHECK
+  ↓
+RISK SCORING
+  ↓
+SECURITY RESULT
+  ↓
+USER WARNING
+  ↓
+USER DECISION
+  ↓
+OPEN / CANCEL / REPORT
+
+Never automatically open a suspicious destination.
+
+============================================================
+CORE FEATURES
+============================================================
+
+Implement ALL of the following.
+
+------------------------------------------------------------
+FEATURE 1 — QR SCANNING
+------------------------------------------------------------
+
+Provide a browser-based QR scanner.
+
+Users should be able to:
+
+- use device camera
+- scan QR code
+- decode QR contents
+- display decoded content
+- analyze decoded URL
+- optionally paste a QR image
+- optionally enter a URL manually
+
+The scanner must work on desktop and mobile where browser permissions
+allow camera access.
+
+Handle:
+
+- camera permission denied
+- camera unavailable
+- invalid QR
+- unreadable QR
+- empty QR
+- unsupported QR payload
+- non-URL QR content
+
+Do not assume every QR contains a URL.
+
+If the QR contains:
+
+text
+email
+phone
+Wi-Fi configuration
+UPI/payment data
+SMS
+deep links
+other content
+
+identify the type and explain what SCANZO can and cannot analyze.
+
+------------------------------------------------------------
+FEATURE 2 — URL INPUT / CHECK LINK
+------------------------------------------------------------
+
+Create a separate:
+
+"Check Link"
+
+page.
+
+Users can paste a URL manually.
+
+Perform:
+
+- syntax validation
+- URL parsing
+- protocol detection
+- hostname extraction
+- port extraction
+- path extraction
+- query analysis
+- fragment handling
+- normalization
+- suspicious pattern detection
+
+Never trust client-side validation alone.
+
+Repeat important validation on the server.
+
+------------------------------------------------------------
+FEATURE 3 — DESTINATION ANALYSIS
+------------------------------------------------------------
+
+This is one of the CORE FEATURES.
+
+A QR code may encode:
+
+https://example.com
+
+but the actual navigation chain may become:
+
+QR
+ ↓
+shortener
+ ↓
+redirect domain
+ ↓
+tracking URL
+ ↓
+final destination
+
+SCANZO must distinguish between:
+
+ENCODED DESTINATION
+
+and
+
+OBSERVED / ANALYZED DESTINATION
+
+Store the original QR payload separately.
+
+If technically safe and feasible, resolve redirects using a controlled
+server-side mechanism.
+
+Do NOT blindly fetch arbitrary resources.
+
+Implement:
+
+- redirect limit
+- request timeout
+- allowed protocols
+- SSRF protection
+- private IP blocking
+- localhost blocking
+- loopback blocking
+- internal network blocking
+- cloud metadata endpoint protection
+- dangerous port restrictions
+- DNS rebinding awareness
+- response-size limits
+- content-type restrictions
+- redirect-chain limits
+
+Do not expose the backend as an SSRF proxy.
+
+------------------------------------------------------------
+FEATURE 4 — DESTINATION CHANGE DETECTION
+------------------------------------------------------------
+
+This is a CORE UNIQUE FEATURE.
+
+If a QR code has previously been observed pointing to:
+
+https://example.com/offer
+
+and later the same QR is found to point to:
+
+https://suspicious.example.net/login
+
+SCANZO should detect the change.
+
+Display:
+
+"Destination changed"
+
+and show:
+
+Previous destination:
+https://example.com/offer
+
+Current destination:
+https://suspicious.example.net/login
+
+Status:
+HIGH RISK / SUSPICIOUS
+
+Explain:
+
+"The destination associated with this QR code has changed from its
+previously observed destination."
+
+Do NOT falsely claim that two QR images are identical unless there is
+a reliable identifier/fingerprint.
+
+Use an appropriate QR/content fingerprint strategy.
+
+Store historical observations.
+
+------------------------------------------------------------
+FEATURE 5 — COMMUNITY REPORTING
+------------------------------------------------------------
+
+SCANZO is not only a scanner.
+
+It is a community safety system.
+
+Users can report a destination as:
+
+- Safe
+- Suspicious
+- Phishing
+- Scam
+- Malicious
+- Fake payment page
+- Impersonation
+- Other
+
+Allow:
+
+- reason
+- optional description
+- timestamp
+- URL/destination
+- reporter identity where appropriate
+- confidence/weight if implemented
+
+Do NOT expose unnecessary personal information.
+
+Prevent report spam.
+
+Implement:
+
+- rate limiting
+- duplicate detection
+- authentication where necessary
+- input validation
+- abuse controls
+
+------------------------------------------------------------
+FEATURE 6 — PREVIOUSLY REPORTED CRITICAL URL
+------------------------------------------------------------
+
+This is another CORE FEATURE.
+
+If a destination has previously been reported as critical/dangerous,
+and another user scans the same destination later:
+
+SCANZO MUST immediately show a warning.
+
+Example:
+
+"COMMUNITY WARNING"
+
+"This destination has previously been reported as dangerous."
+
+Show:
+
+- report category
+- number of reports
+- most recent report time
+- risk level
+- general reason
+- whether the destination has changed
+
+DO NOT expose private reporter information.
+
+A previously critical destination should not simply appear as a
+normal safe URL because a new user scanned it.
+
+------------------------------------------------------------
+FEATURE 7 — COMMUNITY INTELLIGENCE
+------------------------------------------------------------
+
+Create a:
+
+"Community Intel"
+
+section/page.
+
+Display aggregated information such as:
+
+- recently reported domains
+- frequently reported destinations
+- high-risk destinations
+- recent community warnings
+- report categories
+- destination changes
+- safety trends
+
+Avoid creating fake statistics.
+
+Only display statistics derived from actual database records.
+
+If there is insufficient data, explicitly display:
+
+"Not enough community observations yet."
+
+Do not fabricate activity.
+
+------------------------------------------------------------
+FEATURE 8 — RISK ENGINE
+------------------------------------------------------------
+
+Implement a transparent risk scoring mechanism.
+
+Example risk factors:
+
+1. HTTPS usage
+2. suspicious hostname
+3. suspicious TLD
+4. IP-address destination
+5. excessive URL length
+6. encoded characters
+7. suspicious query parameters
+8. credential-related paths
+9. login/payment impersonation indicators
+10. URL shortener
+11. redirect chain
+12. destination change
+13. community reports
+14. repeated critical reports
+15. domain mismatch
+16. suspicious redirect destination
+
+Do NOT pretend that a heuristic score is a commercial antivirus verdict.
+
+Call it something such as:
+
+"SCANZO Risk Assessment"
+
+or
+
+"SCANZO Security Assessment"
+
+The score must be explainable.
+
+Example:
+
+Risk Score: 78 / 100
+
+Reasons:
+
++ Destination changed from previous observation
++ Multiple community reports
++ Redirect chain detected
++ Suspicious login path
+
+The user must understand why the score exists.
+
+------------------------------------------------------------
+FEATURE 9 — SECURITY CLASSIFICATION
+------------------------------------------------------------
+
+Use clear categories such as:
+
+LOW RISK
+MEDIUM RISK
+HIGH RISK
+CRITICAL
+
+Do not use only colors.
+
+Always combine:
+
+- label
+- icon
+- explanation
+- textual warning
+
+Example:
+
+CRITICAL
+
+"Community reports and destination analysis indicate that this
+destination may be dangerous."
+
+------------------------------------------------------------
+FEATURE 10 — USER CONSENT BEFORE REDIRECTION
+------------------------------------------------------------
+
+This is extremely important.
+
+SCANZO should NEVER immediately redirect the user after scanning.
+
+Instead show:
+
+Destination:
+https://example.com
+
+Risk:
+LOW RISK
+
+Analysis:
+No major warning indicators detected.
+
+[Open destination]
+
+[Cancel]
+
+For suspicious:
+
+Destination:
+https://example-login.example
+
+Risk:
+HIGH RISK
+
+Warnings:
+- Suspicious login path
+- Destination changed
+- Community reports detected
+
+[Open anyway]
+
+[Cancel]
+
+For critical:
+
+Require a stronger warning.
+
+Do not make "Open anyway" visually equivalent to the normal safe action.
+
+------------------------------------------------------------
+FEATURE 11 — SAFE RESULT
+------------------------------------------------------------
+
+Safe result should still explain:
+
+"Why this appears low risk."
+
+Example:
+
+- HTTPS enabled
+- No known community reports
+- No suspicious redirect observed
+- Destination has remained consistent
+
+But never claim:
+
+"100% safe"
+
+Instead say:
+
+"No major warning indicators were detected."
+
+------------------------------------------------------------
+FEATURE 12 — DESTINATION HISTORY
+------------------------------------------------------------
+
+For previously observed destinations show:
+
+First observed:
+date/time
+
+Last observed:
+date/time
+
+Previous destination:
+...
+
+Current destination:
+...
+
+Number of observations:
+...
+
+Status:
+...
+
+This creates a historical security layer.
+
+------------------------------------------------------------
+FEATURE 13 — QR FINGERPRINTING
+------------------------------------------------------------
+
+Develop a reasonable mechanism to identify repeated QR content.
+
+Do not rely only on screenshot/image equality.
+
+For URL QR codes:
+
+normalize payload
++
+canonical representation
++
+cryptographic hash
+
+Use a safe hash such as SHA-256.
+
+Example concept:
+
+QR payload
+    ↓
+normalize
+    ↓
+canonical payload
+    ↓
+SHA-256 fingerprint
+    ↓
+database
+
+Use this fingerprint to connect repeated observations.
+
+------------------------------------------------------------
+FEATURE 14 — URL NORMALIZATION
+------------------------------------------------------------
+
+Implement canonical URL processing.
+
+Handle:
+
+- trailing slash
+- hostname case
+- default ports
+- URL encoding
+- punycode/IDN awareness
+- query strings
+- fragments
+
+Do not destroy meaningful URL information.
+
+Store:
+
+original URL
+
+and
+
+normalized URL
+
+separately.
+
+------------------------------------------------------------
+FEATURE 15 — HOMOGRAPH / LOOKALIKE DOMAIN DETECTION
+------------------------------------------------------------
+
+Implement detection or warning for suspicious lookalike domains.
+
+Examples:
+
+paypa1.example
+
+micros0ft.example
+
+xn--...
+
+Do not claim certainty.
+
+Show:
+
+"Possible lookalike domain"
+
+Explain why.
+
+Handle Unicode carefully.
+
+------------------------------------------------------------
+FEATURE 16 — URL SHORTENER DETECTION
+------------------------------------------------------------
+
+Detect common URL shortening patterns where practical.
+
+If a short URL is encountered:
+
+show:
+
+"Shortened URL detected."
+
+If destination resolution is safely possible:
+
+show the observed destination.
+
+If it cannot be safely resolved:
+
+state:
+
+"Final destination could not be safely resolved."
+
+Never fail silently.
+
+------------------------------------------------------------
+FEATURE 17 — REDIRECT CHAIN
+------------------------------------------------------------
+
+If safe controlled analysis observes:
+
+A → B → C
+
+show:
+
+Redirect chain detected
+
+1. A
+2. B
+3. C
+
+If a suspicious final destination appears:
+
+highlight the final destination as the important risk.
+
+------------------------------------------------------------
+FEATURE 18 — COMMUNITY REPORT DEDUPLICATION
+------------------------------------------------------------
+
+Prevent a user from repeatedly creating identical reports.
+
+Implement:
+
+- normalized destination comparison
+- duplicate report detection
+- rate limiting
+- cooldown
+- authenticated reporting where appropriate
+
+Do not allow a single user to artificially generate unlimited reports.
+
+------------------------------------------------------------
+FEATURE 19 — REPORT TRUST / CONFIDENCE
+------------------------------------------------------------
+
+If implementing report weighting:
+
+do it carefully.
+
+Do not make:
+
+"10 reports = definitely malicious"
+
+automatically.
+
+Community reports are evidence, not absolute truth.
+
+Represent them as:
+
+Community confidence
+
+or
+
+Community observations.
+
+------------------------------------------------------------
+FEATURE 20 — SECURITY LOGGING
+------------------------------------------------------------
+
+Create appropriate application security logs.
+
+Log security-relevant events such as:
+
+- failed login
+- suspicious request
+- blocked SSRF attempt
+- rate-limit trigger
+- report submission
+- URL analysis
+- dangerous destination warning
+- administrative action
+
+Do NOT log:
+
+- passwords
+- sensitive tokens
+- unnecessary personal data
+- full authentication secrets
+
+Implement appropriate log sanitization.
+
+============================================================
+WEB EXPLOITATION AND DEFENSE REQUIREMENTS
+============================================================
+
+This project is specifically for:
+
+WEB EXPLOITATION AND DEFENSE - 23CY506
+
+Therefore security must be visible in the implementation.
+
+Do NOT simply write a paragraph claiming:
+
+"SQL Injection prevented."
+
+Actually implement the defense.
+
+============================================================
+DEFENSE 1 — SQL INJECTION
+============================================================
+
+Use:
+
+- parameterized queries
+- ORM safe APIs
+- prepared statements
+
+Never construct SQL using raw user input.
+
+Demonstrate protection through tests.
+
+------------------------------------------------------------
+DEFENSE 2 — XSS
+------------------------------------------------------------
+
+User-controlled fields include:
+
+- report descriptions
+- URLs
+- usernames
+- community comments if implemented
+
+Escape/sanitize output appropriately.
+
+Do not render untrusted HTML directly.
+
+Prevent:
+
+stored XSS
+reflected XSS
+DOM-based XSS
+
+Implement appropriate Content Security Policy where practical.
+
+------------------------------------------------------------
+DEFENSE 3 — SSRF
+------------------------------------------------------------
+
+This is one of the MOST IMPORTANT defenses for SCANZO.
+
+Because SCANZO analyzes URLs server-side, an attacker may submit:
+
+http://localhost
+http://127.0.0.1
+http://169.254.169.254
+private network addresses
+internal services
+
+Implement SSRF defenses.
+
+Block:
+
+localhost
+127.0.0.0/8
+10.0.0.0/8
+172.16.0.0/12
+192.168.0.0/16
+169.254.0.0/16
+IPv6 loopback
+IPv6 private ranges
+link-local addresses
+cloud metadata endpoints
+
+Also account for:
+
+DNS rebinding
+redirect-to-private-IP
+hostname resolution tricks
+IPv4/IPv6 representations
+
+Do not trust only the initial hostname.
+
+Re-check resolved destinations.
+
+------------------------------------------------------------
+DEFENSE 4 — OPEN REDIRECT
+------------------------------------------------------------
+
+Do not create an endpoint such as:
+
+/redirect?url=<anything>
+
+that blindly redirects.
+
+All navigation should pass through validation and explicit consent.
+
+------------------------------------------------------------
+DEFENSE 5 — CSRF
+------------------------------------------------------------
+
+For state-changing authenticated operations implement appropriate
+CSRF protection depending on the architecture.
+
+Especially:
+
+- report submission
+- profile changes
+- admin actions
+
+------------------------------------------------------------
+DEFENSE 6 — AUTHENTICATION
+------------------------------------------------------------
+
+Implement secure authentication.
+
+Use:
+
+- secure password hashing
+- password validation
+- secure session handling
+- HttpOnly cookies where applicable
+- Secure cookies in production
+- SameSite policy
+- authentication checks
+- logout
+- authorization
+
+Never store plaintext passwords.
+
+------------------------------------------------------------
+DEFENSE 7 — AUTHORIZATION
+------------------------------------------------------------
+
+Separate:
+
+normal users
+moderators/admins
+
+A normal user must not access administrative functionality.
+
+Do not rely only on frontend route hiding.
+
+Enforce authorization on the backend.
+
+------------------------------------------------------------
+DEFENSE 8 — RATE LIMITING
+------------------------------------------------------------
+
+Apply rate limits to:
+
+- login
+- registration
+- URL analysis
+- QR analysis
+- report creation
+- sensitive APIs
+
+Return proper error messages without exposing internal details.
+
+------------------------------------------------------------
+DEFENSE 9 — INPUT VALIDATION
+------------------------------------------------------------
+
+Validate all user-controlled input.
+
+Use schema validation.
+
+Validate:
+
+- URL
+- username
+- email
+- report category
+- report description
+- API parameters
+- IDs
+- query parameters
+
+Never trust frontend validation.
+
+------------------------------------------------------------
+DEFENSE 10 — SECURITY HEADERS
+============================================================
+
+Implement appropriate headers such as:
+
+Content-Security-Policy
+X-Content-Type-Options
+Referrer-Policy
+Permissions-Policy
+Strict-Transport-Security in production
+
+Use frame protections appropriate to the application.
+
+Do not add headers blindly if they break legitimate functionality.
+
+------------------------------------------------------------
+DEFENSE 11 — CORS
+------------------------------------------------------------
+
+Do not use:
+
+Access-Control-Allow-Origin: *
+
+for sensitive authenticated APIs unless genuinely required.
+
+Configure allowed origins appropriately.
+
+------------------------------------------------------------
+DEFENSE 12 — ERROR HANDLING
+------------------------------------------------------------
+
+Never expose:
+
+- stack traces
+- database errors
+- internal paths
+- secrets
+- environment variables
+- implementation details
+
+to normal users.
+
+Use safe production error messages.
+
+------------------------------------------------------------
+DEFENSE 13 — SECRET MANAGEMENT
+------------------------------------------------------------
+
+Never hardcode:
+
+API keys
+database passwords
+JWT secrets
+service credentials
+
+Use environment variables.
+
+Provide:
+
+.env.example
+
+without actual secrets.
+
+------------------------------------------------------------
+DEFENSE 14 — FILE / IMAGE HANDLING
+------------------------------------------------------------
+
+If QR image upload is implemented:
+
+validate:
+
+- file size
+- MIME type
+- extension
+- content
+- processing limits
+
+Do not trust the filename or MIME type alone.
+
+Prevent oversized uploads and resource exhaustion.
+
+============================================================
+DATABASE DESIGN
+============================================================
+
+Design a proper relational data model.
+
+Potential entities:
+
+USERS
+QR_OBSERVATIONS
+DESTINATIONS
+DESTINATION_HISTORY
+URL_ANALYSES
+COMMUNITY_REPORTS
+RISK_ASSESSMENTS
+SECURITY_EVENTS
+
+Adapt according to the existing stack.
+
+Do not create unnecessary tables.
+
+============================================================
+SUGGESTED DATA RELATIONSHIP
+============================================================
+
+User
+ |
+ | submits
+ v
+CommunityReport
+ |
+ | references
+ v
+Destination
+ |
+ | has
+ v
+DestinationHistory
+ |
+ | associated with
+ v
+QRObservation
+
+URLAnalysis
+ |
+ v
+RiskAssessment
+
+Implement proper:
+
+- primary keys
+- foreign keys
+- indexes
+- timestamps
+- unique constraints
+- appropriate cascading behavior
+
+Avoid storing redundant data unnecessarily.
+
+============================================================
+DATABASE INTEGRITY
+============================================================
+
+Enforce important constraints at database level where practical.
+
+Examples:
+
+- unique fingerprint
+- valid foreign keys
+- required fields
+- valid enum-like status values
+
+Do not rely exclusively on frontend validation.
+
+============================================================
+API DESIGN
+============================================================
+
+Create clean backend APIs.
+
+Possible structure:
+
+POST /api/scan
+POST /api/analyze-url
+GET  /api/destination/:id
+GET  /api/destination/:id/history
+POST /api/reports
+GET  /api/community/recent
+GET  /api/community/statistics
+GET  /api/health
+
+Authentication routes:
+
+POST /api/auth/register
+POST /api/auth/login
+POST /api/auth/logout
+
+Adapt to the existing framework.
+
+Do NOT blindly use these exact paths if the existing architecture
+has a better consistent structure.
+
+============================================================
+SCAN API BEHAVIOUR
+============================================================
+
+When a user scans:
+
+1. Receive QR payload.
+2. Validate input.
+3. Determine payload type.
+4. If URL:
+   - normalize URL
+   - fingerprint it
+   - perform controlled analysis
+   - inspect redirect chain
+   - inspect destination
+   - check history
+   - check community reports
+   - calculate risk
+5. Store observation where appropriate.
+6. Return structured result.
+7. Frontend displays warning.
+8. User chooses whether to open.
+
+============================================================
+EXAMPLE RESPONSE MODEL
+============================================================
+
+{
+  "status": "high_risk",
+  "originalPayload": "...",
+  "normalizedUrl": "...",
+  "destination": "...",
+  "riskScore": 78,
+  "riskLevel": "HIGH",
+  "signals": [
+    "Destination changed",
+    "Community reports detected",
+    "Suspicious login path"
+  ],
+  "community": {
+    "reports": 4,
+    "criticalReports": 2
+  },
+  "history": {
+    "destinationChanged": true
+  },
+  "redirectChain": [],
+  "requiresConfirmation": true
+}
+
+Use appropriate naming according to the actual stack.
+
+============================================================
+FRONTEND UX
+============================================================
+
+The interface must feel like a real security product.
+
+Brand:
+
+SCANZO
+
+Possible tagline:
+
+"Scan. Understand. Decide."
+
+OR
+
+"Know where it leads."
+
+Use one final tagline consistently.
+
+Do NOT overload the interface with cybersecurity clichés.
+
+Design principles:
+
+- clean
+- modern
+- calm
+- trustworthy
+- professional
+- accessible
+- mobile responsive
+- strong typography
+- clear hierarchy
+
+Avoid:
+
+- excessive gradients
+- unnecessary animations
+- hacker-themed visuals
+- skulls
+- matrix rain
+- excessive neon
+- fake terminal interfaces
+
+============================================================
+BRAND
+============================================================
+
+Product name:
+
+SCANZO
+
+Logo concept:
+
+The "CA" / scanner element should visually communicate scanning.
+
+Use a clean geometric symbol.
+
+Brand colors may use:
+
+green
+white
+black/dark neutral
+
+The interface should remain professional.
+
+Logo must work on:
+
+dark background
+light background
+navigation bar
+favicon
+mobile screen
+
+============================================================
+MAIN NAVIGATION
+============================================================
+
+Suggested:
+
+SCANZO logo
+
+Scan QR
+Check Link
+Community Intel
+
+Right side:
+
+Sign In
+Get Started
+
+Authenticated user:
+
+Dashboard
+History
+Reports
+Profile
+Logout
+
+Admin/moderator:
+
+Moderation
+
+Only expose controls according to authorization.
+
+============================================================
+HOME PAGE
+============================================================
+
+Hero:
+
+SCANZO
+
+"Know where a QR code leads before you open it."
+
+Primary action:
+
+[Scan QR]
+
+Secondary:
+
+[Check a Link]
+
+Supporting explanation:
+
+"SCANZO analyzes QR destinations, redirect behaviour, destination
+changes, and community reports before you decide whether to open them."
+
+============================================================
+SCAN PAGE
+============================================================
+
+Show:
+
+Camera scanner
+
+OR
+
+Upload QR image
+
+OR
+
+Paste QR content
+
+After scan:
+
+Decoded content
+
+Destination
+
+Risk level
+
+Warnings
+
+Community information
+
+Historical information
+
+Action buttons
+
+============================================================
+RESULT PAGE
+============================================================
+
+Example:
+
+----------------------------------------
+SECURITY ASSESSMENT
+
+HIGH RISK
+
+This destination requires caution.
+
+Destination:
+https://example.com/login
+
+WHY?
+
+✓ HTTPS enabled
+⚠ Destination changed
+⚠ Community reports detected
+⚠ Login-related path detected
+
+COMMUNITY
+
+4 reports
+2 critical reports
+
+HISTORY
+
+Previous:
+https://example.com/offer
+
+Current:
+https://example.com/login
+
+----------------------------------------
+
+[OPEN ANYWAY]
+
+[CANCEL]
+
+Make the safe action visually easier.
+
+============================================================
+DESTINATION CHANGE UI
+============================================================
+
+If changed:
+
+⚠ DESTINATION CHANGED
+
+"This QR code was previously observed pointing to a different
+destination."
+
+Previous destination:
+...
+
+Current destination:
+...
+
+Observed:
+...
+
+This must be one of the most visually prominent warnings.
+
+============================================================
+CRITICAL COMMUNITY WARNING
+============================================================
+
+If previously reported critical:
+
+CRITICAL COMMUNITY WARNING
+
+"This destination has previously received critical safety reports."
+
+Show:
+
+Category
+Report count
+Latest observation
+General reason
+
+Then:
+
+[Go Back]
+
+[Open Anyway]
+
+Opening should require explicit acknowledgement.
+
+============================================================
+COMMUNITY INTEL
+============================================================
+
+Create useful dashboards.
+
+Possible cards:
+
+Recently Reported
+High Risk Destinations
+Destination Changes
+Community Reports
+
+Possible tables:
+
+Domain
+Risk
+Reports
+Last observed
+Status
+
+Do not expose private data.
+
+============================================================
+USER DASHBOARD
+============================================================
+
+Authenticated user can view:
+
+- scan history
+- previously analyzed URLs
+- reports submitted
+- bookmarked destinations if implemented
+- security activity
+
+Do not overbuild unnecessary features.
+
+============================================================
+ADMIN / MODERATION
+============================================================
+
+If included, create secure moderator functionality.
+
+Moderators can:
+
+- review reports
+- mark report as valid/rejected
+- investigate abuse
+- remove spam
+- inspect security events
+
+Protect all admin APIs server-side.
+
+Do not make a fake admin page accessible to everyone.
+
+============================================================
+ACCESSIBILITY
+============================================================
+
+Implement:
+
+- keyboard navigation
+- visible focus states
+- labels
+- semantic HTML
+- accessible buttons
+- adequate contrast
+- readable warning messages
+- responsive layouts
+
+Do not communicate risk using color alone.
+
+============================================================
+MOBILE
+============================================================
+
+QR scanning is a mobile-first use case.
+
+Test:
+
+360px
+390px
+414px
+768px
+1024px
+1440px+
+
+Ensure:
+
+- scanner fits screen
+- buttons are usable
+- warnings are readable
+- navigation collapses appropriately
+
+============================================================
+ERROR STATES
+============================================================
+
+Implement professional error handling.
+
+Examples:
+
+Camera permission denied:
+
+"Camera access is required to scan QR codes. You can also upload
+a QR image or enter the destination manually."
+
+Invalid QR:
+
+"We couldn't decode this QR code."
+
+Invalid URL:
+
+"This doesn't appear to be a valid URL."
+
+Analysis timeout:
+
+"The destination could not be safely analyzed within the allowed
+time."
+
+Blocked internal destination:
+
+"For security reasons, this destination cannot be analyzed."
+
+Server error:
+
+"Something went wrong. Please try again."
+
+Never expose technical stack traces.
+
+============================================================
+LOADING STATES
+============================================================
+
+During analysis show:
+
+Analyzing QR...
+Checking destination...
+Checking redirect chain...
+Checking community reports...
+Comparing destination history...
+Preparing security assessment...
+
+Do not make fake progress percentages.
+
+============================================================
+SECURITY RESULT LANGUAGE
+============================================================
+
+Never use absolute claims.
+
+Avoid:
+
+"This website is 100% safe."
+
+Use:
+
+"No major warning indicators were detected."
+
+Avoid:
+
+"This website is definitely malicious."
+
+Use:
+
+"SCANZO identified multiple indicators associated with potentially
+dangerous destinations."
+
+This distinction is important academically and technically.
+
+============================================================
+TESTING REQUIREMENTS
+============================================================
+
+Do not consider the project complete until tests have been performed.
+
+Create:
+
+unit tests
+integration tests
+API tests
+security tests
+frontend tests where appropriate
+
+Test:
+
+valid URL
+invalid URL
+QR decode
+duplicate report
+critical report
+destination change
+redirect chain
+SSRF
+XSS
+SQL injection
+CSRF
+authentication
+authorization
+rate limiting
+input validation
+error handling
+
+============================================================
+SECURITY TEST CASES
+============================================================
+
+Test SSRF attempts such as:
+
+http://127.0.0.1
+http://localhost
+http://169.254.169.254
+private network addresses
+
+Verify that they are blocked.
+
+Test XSS payloads in report descriptions.
+
+Verify they are safely stored/rendered.
+
+Test SQL injection-style inputs.
+
+Verify database remains protected.
+
+Test unauthorized admin API access.
+
+Verify it returns an authorization failure.
+
+Test excessive report submissions.
+
+Verify rate limiting works.
+
+============================================================
+THREAT MODEL
+============================================================
+
+Create an internal threat model during development.
+
+Actors:
+
+1. Normal user
+2. Malicious QR creator
+3. Malicious website owner
+4. Spam reporter
+5. Attacker targeting SCANZO backend
+6. Unauthorized administrator
+7. Automated bot
+
+Threats:
+
+- phishing
+- malicious redirects
+- SSRF
+- XSS
+- SQL injection
+- CSRF
+- authentication attacks
+- authorization bypass
+- report manipulation
+- API abuse
+- rate-limit bypass
+- malicious file upload
+- DNS rebinding
+- open redirect
+- sensitive information disclosure
+
+Map each threat to an implemented defense.
+
+============================================================
+SECURITY ARCHITECTURE
+============================================================
+
+Create a security architecture similar to:
+
+USER
+ ↓
+FRONTEND VALIDATION
+ ↓
+HTTPS
+ ↓
+BACKEND API
+ ↓
+AUTHENTICATION / AUTHORIZATION
+ ↓
+INPUT VALIDATION
+ ↓
+RATE LIMITING
+ ↓
+SECURITY ANALYSIS SERVICE
+ ↓
+SSRF PROTECTION
+ ↓
+URL / DESTINATION ANALYSIS
+ ↓
+DATABASE
+ ↓
+SECURITY RESULT
+ ↓
+USER CONSENT
+ ↓
+EXTERNAL DESTINATION
+
+Clearly separate trusted and untrusted zones.
+
+============================================================
+NO BLIND EXTERNAL REQUESTS
+============================================================
+
+The URL analysis subsystem is a security-sensitive subsystem.
+
+Never implement:
+
+fetch(userProvidedUrl)
+
+without validation.
+
+Every external request must pass through security controls.
+
+============================================================
+PERFORMANCE
+============================================================
+
+Avoid unnecessary requests.
+
+Use:
+
+- database indexes
+- caching where appropriate
+- bounded analysis
+- timeouts
+- request limits
+- efficient queries
+
+Do not allow one URL analysis to consume unlimited server resources.
+
+============================================================
+DEPENDENCIES
+============================================================
+
+Before installing packages:
+
+inspect package.json
+
+Use established, maintained packages.
+
+Avoid unnecessary dependencies.
+
+After implementation:
+
+run dependency audit where available.
+
+============================================================
+ENVIRONMENT CONFIGURATION
+============================================================
+
+Create:
+
+.env.example
+
+Document required variables.
+
+Never commit:
+
+.env
+API keys
+passwords
+tokens
+private credentials
+
+============================================================
+DEPLOYMENT
+============================================================
+
+The project must work locally and in production.
+
+If using Vercel or similar:
+
+ensure:
+
+- production environment variables
+- backend/API configuration
+- database connection
+- authentication callbacks
+- CORS
+- secure cookies
+- serverless limitations
+- URL analysis timeouts
+- production build
+
+Do not assume something working on localhost automatically works
+in production.
+
+============================================================
+PRODUCTION BUG CHECK
+============================================================
+
+Specifically inspect for:
+
+"works locally but fails on Vercel"
+
+issues.
+
+Check:
+
+- environment variables
+- database URLs
+- auth configuration
+- allowed origins
+- API routes
+- server/client separation
+- absolute URLs
+- cookie configuration
+- HTTPS
+- runtime compatibility
+- serverless function limitations
+
+============================================================
+SEED DATA
+============================================================
+
+If development seed data is required:
+
+clearly mark it as development data.
+
+Do not make fake community activity appear to be real.
+
+Seed data may include:
+
+safe example
+suspicious example
+critical example
+destination-change example
+
+Clearly label demo records.
+
+============================================================
+NO FAKE SECURITY
+============================================================
+
+This rule is extremely important.
+
+Do not create buttons that only pretend to scan.
+
+Do not display fake risk scores.
+
+Do not create fake "AI analysis" without an actual mechanism.
+
+Do not claim VirusTotal or external intelligence was used unless it
+is actually integrated.
+
+Do not claim a destination is safe simply because:
+
+- HTTPS exists
+- domain exists
+- page loads
+- no report exists
+
+"No known warning" is not the same as "safe."
+
+============================================================
+NO FABRICATED COMMUNITY DATA
+============================================================
+
+Never show:
+
+"10,000 users"
+"2,500 reports"
+"99.9% protection"
+
+unless these are genuinely backed by data.
+
+============================================================
+CODE QUALITY
+============================================================
+
+Use:
+
+- clear naming
+- modular architecture
+- reusable components
+- separation of concerns
+- typed interfaces where applicable
+- centralized validation
+- centralized error handling
+- secure database access
+- comments only where useful
+
+Avoid:
+
+- giant files
+- duplicated logic
+- hardcoded values
+- magic numbers
+- unnecessary abstractions
+- dead code
+
+============================================================
+PROJECT STRUCTURE
+============================================================
+
+Adapt to the actual framework, but aim for logical separation:
+
+frontend/
+backend/
+database/
+components/
+services/
+security/
+utils/
+tests/
+docs/
+
+If using a full-stack framework, follow its idiomatic structure.
+
+============================================================
+DOCUMENTATION INSIDE PROJECT
+============================================================
+
+Create/update:
+
+README.md
+
+Include:
+
+Project overview
+Problem statement
+Objectives
+Architecture
+Features
+Security defenses
+Database
+API
+Setup
+Environment variables
+Testing
+Deployment
+Known limitations
+
+============================================================
+README MUST NOT CLAIM
+============================================================
+
+Do not claim:
+
+"100% protection"
+"detects all phishing"
+"guarantees safe browsing"
+
+Instead:
+
+"SCANZO provides a preventive security layer that combines
+destination analysis, historical observation, and community
+intelligence before users choose to open QR destinations."
+
+============================================================
+PROJECT UNIQUENESS
+============================================================
+
+The project should NOT be presented as:
+
+"just a QR scanner."
+
+The differentiation is the combination of:
+
+1. QR decoding
+2. pre-navigation analysis
+3. destination inspection
+4. redirect-chain awareness
+5. historical destination tracking
+6. destination-change detection
+7. community reporting
+8. critical community warnings
+9. explainable risk assessment
+10. user-controlled navigation
+11. web exploitation defenses
+
+The strongest differentiator is:
+
+A QR destination can be treated as an evolving object rather than
+a static URL.
+
+SCANZO observes:
+
+"What did this QR lead to before?"
+
+"What does it lead to now?"
+
+"What has the community reported?"
+
+"What security indicators are present?"
+
+"Should the user proceed?"
+
+============================================================
+CODE OF COMMUNITY CONNECTION
+============================================================
+
+The project must clearly satisfy the "Code for Communities" concept.
+
+The community value is:
+
+A QR code encountered by one person can generate useful safety
+information for other people.
+
+Example:
+
+User A scans a suspicious QR.
+
+User A reports it.
+
+SCANZO stores the observation.
+
+User B scans the same destination later.
+
+SCANZO warns User B.
+
+Therefore:
+
+Individual observation
+        ↓
+Community knowledge
+        ↓
+Collective protection
+
+This must be visible in the actual product, not only documentation.
+
+============================================================
+LITERATURE / ACADEMIC CONTEXT
+============================================================
+
+The implementation should be informed by established research into:
+
+- QR code security
+- QR phishing / QRishing
+- malicious URL detection
+- usable security
+- secure QR scanners
+- phishing detection
+- community-driven security
+
+Do not fabricate citations.
+
+If academic references are included, use real sources.
+
+============================================================
+LIMITATIONS
+============================================================
+
+Clearly acknowledge:
+
+- heuristic analysis cannot guarantee maliciousness detection
+- community reports can be incorrect
+- previously unseen malicious URLs may have no reports
+- destination analysis may fail due to network restrictions
+- JavaScript-heavy websites may not be fully evaluated
+- QR payload may not be a URL
+- safe-looking domains can still host malicious content
+- external threat intelligence is not automatically available
+- URL reputation changes over time
+
+These limitations make the project academically credible.
+
+============================================================
+ADMINISTRATIVE / SECURITY SAFETY
+============================================================
+
+Do not implement dangerous offensive functionality.
+
+The project is a defensive security application.
+
+Any security testing must be performed only against the local
+application or controlled test environments.
+
+============================================================
+IMPLEMENTATION PHASES
+============================================================
+
+Work in the following order.
+
+PHASE 1
+Repository audit.
+
+PHASE 2
+Architecture correction.
+
+PHASE 3
+Database/schema verification.
+
+PHASE 4
+Authentication and authorization.
+
+PHASE 5
+QR scanning.
+
+PHASE 6
+URL validation and normalization.
+
+PHASE 7
+Destination analysis.
+
+PHASE 8
+SSRF protection.
+
+PHASE 9
+Redirect-chain handling.
+
+PHASE 10
+QR fingerprinting.
+
+PHASE 11
+Destination history.
+
+PHASE 12
+Destination-change detection.
+
+PHASE 13
+Community reporting.
+
+PHASE 14
+Critical destination warnings.
+
+PHASE 15
+Risk engine.
+
+PHASE 16
+Frontend result interface.
+
+PHASE 17
+Community intelligence.
+
+PHASE 18
+Security hardening.
+
+PHASE 19
+Testing.
+
+PHASE 20
+Deployment.
+
+PHASE 21
+Final audit.
+
+Do not jump directly to Phase 21.
+
+============================================================
+AFTER EACH PHASE
+============================================================
+
+After implementing a phase:
+
+1. Run relevant tests.
+2. Check for build errors.
+3. Check TypeScript/lint errors if applicable.
+4. Check runtime errors.
+5. Inspect changed files.
+6. Verify security implications.
+7. Continue only when the phase is stable.
+
+============================================================
+FINAL SECURITY AUDIT
+============================================================
+
+Before declaring completion, inspect the complete application for:
+
+[ ] SQL injection protection
+[ ] XSS protection
+[ ] CSRF protection
+[ ] SSRF protection
+[ ] open redirect protection
+[ ] authentication security
+[ ] authorization
+[ ] rate limiting
+[ ] input validation
+[ ] output encoding
+[ ] secure cookies
+[ ] security headers
+[ ] CORS
+[ ] secret management
+[ ] file upload security
+[ ] error handling
+[ ] logging
+[ ] dependency vulnerabilities
+[ ] database constraints
+[ ] API authorization
+
+============================================================
+FINAL FUNCTIONAL AUDIT
+============================================================
+
+Verify:
+
+[ ] QR scan works
+[ ] QR upload works if implemented
+[ ] manual URL check works
+[ ] URL normalization works
+[ ] risk assessment works
+[ ] community reports work
+[ ] critical reports appear during later scans
+[ ] destination history works
+[ ] destination change detection works
+[ ] redirect detection works
+[ ] user consent works
+[ ] suspicious destination warning works
+[ ] safe result works
+[ ] community intel works
+[ ] authentication works
+[ ] authorization works
+[ ] mobile UI works
+[ ] production build works
+
+============================================================
+CRITICAL TEST SCENARIOS
+============================================================
+
+Create test scenarios for at least these cases.
+
+TEST 1
+Normal HTTPS URL
+
+Expected:
+LOW RISK / no major warnings.
+
+TEST 2
+Invalid URL
+
+Expected:
+validation error.
+
+TEST 3
+Previously reported critical URL
+
+Expected:
+critical community warning.
+
+TEST 4
+Previously observed QR whose destination changed
+
+Expected:
+destination-change warning.
+
+TEST 5
+URL shortener
+
+Expected:
+shortened URL warning and safe destination analysis where possible.
+
+TEST 6
+Redirect chain
+
+Expected:
+redirect chain displayed.
+
+TEST 7
+localhost
+
+Expected:
+SSRF blocked.
+
+TEST 8
+private IP
+
+Expected:
+SSRF blocked.
+
+TEST 9
+XSS report
+
+Expected:
+payload rendered harmlessly.
+
+TEST 10
+SQL injection input
+
+Expected:
+no SQL injection.
+
+TEST 11
+unauthorized admin request
+
+Expected:
+403/authorization failure.
+
+TEST 12
+rapid repeated report submissions
+
+Expected:
+rate limiting.
+
+============================================================
+FINAL DEMO FLOW
+============================================================
+
+The final application should support a clean demonstration.
+
+DEMO:
+
+1. Open SCANZO.
+2. Click Scan QR.
+3. Scan a test QR.
+4. Show decoded destination.
+5. Show analysis.
+6. Show risk level.
+7. Show explanation.
+8. Show community status.
+9. Show destination history.
+10. Show destination change if applicable.
+11. Require user confirmation.
+12. Open only after user consent.
+13. Submit a community report.
+14. Scan the same destination again.
+15. Show community warning.
+16. Demonstrate security controls.
+17. Demonstrate SSRF blocking using a controlled local test.
+18. Demonstrate XSS protection.
+19. Demonstrate authentication/authorization.
+
+============================================================
+DO NOT STOP AT UI
+============================================================
+
+A visually impressive frontend with fake backend logic is NOT
+acceptable.
+
+The following are NOT considered completion:
+
+- landing page only
+- static cards
+- fake QR scanner
+- fake risk score
+- hardcoded warnings
+- fake community reports
+- fake history
+- frontend-only authentication
+- frontend-only authorization
+- simulated API responses
+- dummy database
+- buttons that do nothing
+
+Every important feature must have a real implementation.
+
+============================================================
+DO NOT OVERENGINEER
+============================================================
+
+The project must remain realistically implementable by a
+third-year Cyber Security student.
+
+Prefer:
+
+simple
+secure
+explainable
+testable
+maintainable
+
+over:
+
+unnecessary microservices
+complex AI
+massive infrastructure
+unnecessary cloud systems
+
+============================================================
+AI / MACHINE LEARNING
+============================================================
+
+Do NOT add AI just for the sake of saying "AI-powered."
+
+A transparent rule-based risk engine is acceptable and academically
+defensible.
+
+If an actual ML component already exists, inspect it before changing it.
+
+Do not claim machine learning unless an actual trained/integrated
+model exists.
+
+============================================================
+FINAL DELIVERABLE
+============================================================
+
+At the end, the repository must contain a complete working SCANZO
+application.
+
+You must provide a final implementation report in the agent response
+containing:
+
+1. What was already implemented.
+2. What you changed.
+3. What you added.
+4. Database changes.
+5. API changes.
+6. Security defenses implemented.
+7. Tests performed.
+8. Tests passed.
+9. Known limitations.
+10. Deployment requirements.
+11. Remaining issues, if any.
+
+============================================================
+VERY IMPORTANT — IMPLEMENTATION TRUTH
+============================================================
+
+Never tell me:
+
+"Implemented"
+
+unless you actually changed/tested the code.
+
+Never say:
+
+"Fully secure"
+
+because no application can guarantee that.
+
+Instead state exactly what defenses were implemented and what remains
+as a limitation.
+
+If a requirement cannot be safely implemented, explain why and provide
+the safest practical implementation.
+
+============================================================
+START NOW
+============================================================
+
+Do NOT immediately generate code.
+
+First perform a complete repository audit.
+
+Report:
+
+A. Current stack
+B. Current project structure
+C. Existing features
+D. Missing features
+E. Security weaknesses
+F. Database status
+G. Authentication status
+H. Deployment status
+I. Existing SCANZO features that should be preserved
+J. Recommended implementation order
+
+Then begin implementation phase-by-phase.
+
+Do not ask me to manually create every file unless absolutely
+necessary.
+
+Use the existing project as the foundation.
+
+Keep the existing working functionality.
+
+Build SCANZO into a complete, professional, security-focused,
+community-oriented QR safety gateway.
+
+============================================================
+END OF MASTER IMPLEMENTATION PROMPT
+============================================================
