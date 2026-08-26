@@ -1,4 +1,4 @@
-# QRGuard — Community Digital Safety Gateway
+# ScanzO — Community Digital Safety Gateway
 
 > **"Scan it. Check it. Then open it."**
 
